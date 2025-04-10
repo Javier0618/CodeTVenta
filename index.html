@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App de Televisión en Vivo</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>StreamFusion</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://api.themoviedb.org">
+    <link rel="preconnect" href="https://image.tmdb.org">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
+        :root {
+            --background-primary: #121212;
+            --background-secondary: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #dedede;
+            --accent-primary: #00E8FC;
+            --accent-secondary: #7B42F6;
+            --ui-element: #2c2c2c;
+            --ui-hover: #454545;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,120 +27,107 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            overflow: hidden; /* Evitar scroll global */
-          	color: #fff;
+            font-family: "Arial", sans-serif;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            text-align: center;
+            margin: 0;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            overflow-x: hidden;
         }
 
-        /* Estilo del header */
-        .header {
+        /* Header styles */
+        header {
+            background-color: var(--background-secondary);
+            color: var(--text-primary);
+            padding: 0.2rem 0;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #0c0d19;
-            color: #fd9c0d;
-            padding: 10px 20px;
             position: sticky;
             top: 0;
-            z-index: 1001;
-            height: 50px; /* Altura fija del header */
+            z-index: 1000;
+            align-items: center;
+            height: 40px;
         }
-      	h2
-      	{
-          font-size: 3vh;
-      	}
 
-        .header .back-link {
-            color: #fff;
+        .header-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo {
+            margin-left: 0.2rem;
+        }
+
+        h1 {
+            display: flex;
+            font-size: 1.5rem;
+            margin: 0;
+            padding: 0;
+            flex-wrap: nowrap;
+            text-align: center;
+            align-items: center;
+        }
+
+        .highlight {
+            color: var(--accent-primary);
+        }
+
+        .secondary-highlight {
+            color: var(--accent-secondary);
+        }
+
+        .back-link,
+        .report {
+            display: block;
             text-decoration: none;
-            font-size: 20px;
+            color: var(--text-secondary);
+            padding: 10px;
+            font-size: 1.2rem;
+            transition: color 0.3s ease, background-color 0.3s ease;
         }
 
-        .header .back-link:hover {
-            color: #f4f4f4;
+        .back-link:hover,
+        .report:hover {
+            color: var(--text-primary);
+            background-color: var(--ui-hover);
         }
 
-        .header .title {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        /* Contenedor principal */
+        /* Main container */
         .main-container {
             display: flex;
-            flex-direction: column; /* Por defecto, diseño vertical para pantallas pequeñas */
-            height: calc(100vh - 50px); /* Altura limitada por el viewport */
-            position: fixed; /* Fijar el contenedor principal */
-            top: 50px; /* Espacio para el header */
+            flex-direction: column;
+            height: calc(100vh - 40px);
+            position: fixed;
+            top: 40px;
             width: 100%;
         }
 
-        /* Diseño para pantallas grandes */
-        @media (min-width: 600px) {
-            .main-container {
-                flex-direction: row; /* Diseño horizontal para pantallas grandes */
-            }
-        .fullscreen-btn {
-            position: absolute;
-            bottom: 0px;
-            left: 50%;
-    		transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px;
-            cursor: pointer;
-            z-index: 1001;
-            font-size: 14px;
-        }
-        }
-
-        /* Contenedor del reproductor */
+        /* Video container */
         #video-container {
             width: 100%;
             position: relative;
             background-color: #000;
-            overflow: hidden; /* Asegurar que el contenido no se desborde */
-        }
-      
-      	/* Relación de aspecto 16:9 para pantallas pequeñas */
-        @media (max-width: 599px) {
-            #video-container {
-                height: 0;
-                padding-top: 56.25%; /* 16:9 Aspect Ratio */
-            }
-        .fullscreen-btn {
-            position: absolute;
-            bottom: 0px;
-            left: 50%;
-    		transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px;
-            cursor: pointer;
-            z-index: 1001;
-            font-size: 14px;
-        }
+            overflow: hidden;
         }
 
-        /* Reproductor de video */
+        /* Player styles */
         .player {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Ajusta el contenido sin estirarlo */
+            object-fit: contain;
             background-color: #000;
-            display: none; /* Ocultar todos los reproductores por defecto */
+            display: none;
         }
 
         .player.active {
-            display: block; /* Mostrar solo el reproductor activo */
+            display: block;
         }
 
         /* Spinner */
@@ -137,28 +138,24 @@
             transform: translate(-50%, -50%);
             width: 50px;
             height: 50px;
-            border: 5px solid #fff;
-            border-top: 5px solid #007bff;
+            border: 5px solid var(--ui-element);
             border-radius: 50%;
+            border-top-color: var(--accent-primary);
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            0% {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-            100% {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        /* Mensaje de error */
+        /* Error message */
         .error-message {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #fff;
+            color: var(--text-primary);
             font-size: 18px;
             text-align: center;
             padding: 20px;
@@ -166,65 +163,63 @@
             border-radius: 10px;
         }
 
-        /* Contenedor de categorías y canales */
+        /* Start message */
+        .start-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--text-secondary);
+            font-size: 2vh;
+            text-align: center;
+        }
+
+        /* Sidebar */
         .sidebar {
             width: 100%;
             height: 100%;
             display: flex;
-            overflow-x: auto; /* Scroll horizontal para pantallas pequeñas */
+            overflow-x: auto;
         }
 
-        /* Lista de categorías */
+        /* Category list */
         .category-list-container {
-            min-width: 40%; /* Ancho mínimo del 50% */
+            min-width: 40%;
             height: 100%;
-            overflow-y: auto; /* Scroll vertical independiente */
+            overflow-y: auto;
             padding: 10px;
-            background-color: rgba(0, 0, 0, 0.88);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: var(--background-secondary);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
-        /* Lista de canales */
+        /* Channel list */
         .channel-list-container {
-            min-width: 60%; /* Ancho mínimo del 50% */
+            min-width: 60%;
             height: 100%;
-            overflow-y: auto; /* Scroll vertical independiente */
+            overflow-y: auto;
             padding: 20px;
-            background-color: #0c0d19;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: var(--background-primary);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
-        /* Diseño para pantallas grandes */
-        @media (min-width: 600px) {
-            .sidebar {
-                width: 50%; /* Ocupa el 40% del ancho en pantallas grandes */
-                flex-direction: row; /* Alineación horizontal */
-                overflow-x: hidden; /* Desactivar scroll horizontal */
-            }
-
-            .category-list-container {
-                width: 35%; /* Ocupa el 30% del ancho */
-                min-width: auto; /* Restablecer ancho mínimo */
-            }
-
-            .channel-list-container {
-                width: 65%; /* Ocupa el 70% del ancho */
-                min-width: auto; /* Restablecer ancho mínimo */
-            }
-        }
-      
-      	/* Buscador */
+        /* Search bar */
         .search-bar {
             margin-bottom: 15px;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 1px solid var(--ui-element);
+            border-radius: 10px;
             width: 100%;
             box-sizing: border-box;
             font-size: 16px;
+            background-color: var(--ui-element);
+            color: var(--text-primary);
         }
 
-        /* Lista de categorías */
+        .search-bar::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Category list */
         .category-list {
             list-style: none;
             display: flex;
@@ -235,20 +230,20 @@
         .category-list button {
             padding: 10px 0;
             background-color: transparent;
-            color: #fff;
+            color: var(--text-primary);
             border: none;
             cursor: pointer;
-            font-size: 2vh;
+            font-size: 16px;
             transition: color 0.3s ease;
             text-align: left;
         }
 
         .category-list button.selected {
-            color: #ff7f00; /* Color anaranjado */
+            color: var(--accent-primary);
             font-weight: bold;
         }
 
-        /* Lista de canales */
+        /* Channel list */
         .channel-list {
             display: flex;
             flex-direction: column;
@@ -261,34 +256,65 @@
             gap: 15px;
             cursor: pointer;
             transition: transform 0.3s ease;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .channel-item:hover {
+            background-color: var(--ui-element);
         }
 
         .channel-item.selected {
-            background-color: #ff7f00; /* Color anaranjado */
-            border-radius: 5px;
+            background-color: var(--accent-secondary);
+            border-radius: 10px;
             padding: 10px;
         }
 
         .channel-item.selected .channel-name {
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .channel-logo {
             width: 50px;
             height: 50px;
-            background-color: #0c0d19;
+            background-color: var(--background-primary);
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
             border-radius: 10px;
+            flex-shrink: 0;
         }
 
         .channel-name {
-            font-size: 2vh;
-            color: #fff;
+            color: var(--text-primary);
         }
 
-        /* Menú desplegable en pantalla completa */
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 1001;
+        }
+
+        .fullscreen-btn:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        /* Fullscreen menu */
         .fullscreen-menu {
             position: absolute;
             top: 10px;
@@ -298,12 +324,15 @@
         }
 
         .fullscreen-menu i {
-            color: #fff;
+            color: var(--text-primary);
             font-size: 24px;
             cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
         }
 
-        /* Overlay para el menú en pantalla completa */
+        /* Fullscreen overlay */
         .fullscreen-overlay {
             display: none;
             position: absolute;
@@ -316,23 +345,25 @@
             overflow-y: auto;
         }
 
-        /* Contenedor de categorías y canales en el overlay */
+        /* Overlay content */
         .overlay-content {
             display: flex;
-            width: 50%;
-            max-height: 100%;
-            background-color: #0c0d195c;
-            color: #333;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80%;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
             position: absolute;
             top: 50%;
-            left: 25%;
+            left: 50%;
             transform: translate(-50%, -50%);
             overflow-y: auto;
             padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
         }
 
-        /* Columna de categorías */
+        /* Category column */
         .category-column {
             width: 30%;
             max-height: 100%;
@@ -341,33 +372,10 @@
 
         .category-column h2 {
             margin-bottom: 15px;
-            color: #fff;
+            color: var(--text-primary);
         }
 
-        .category-column .category-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .category-column .category-list button {
-            padding: 10px 0;
-            background-color: transparent;
-            color: #fd9c0d;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            transition: color 0.3s ease;
-            text-align: left;
-        }
-
-        .category-column .category-list button.selected {
-            color: #ff7f00; /* Color anaranjado */
-            font-weight: bold;
-        }
-
-        /* Columna de canales */
+        /* Channel column */
         .channel-column {
             width: 70%;
             max-height: 100%;
@@ -375,51 +383,7 @@
             padding-left: 20px;
         }
 
-        .channel-column .channel-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .channel-column .channel-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .channel-column .channel-item.selected {
-            background-color: #ff7f00; /* Color anaranjado */
-            border-radius: 5px;
-            padding: 10px;
-        }
-
-        .channel-column .channel-logo {
-            width: 50px;
-            height: 50px;
-            background-color: #ddd;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            border-radius: 10px;
-        }
-
-        .channel-column .channel-name {
-            font-size: 16px;
-            color: #fff;
-        }
-        h1 {
-            display: flex;
-            font-size: 1.5rem;
-            margin: 0;
-            padding: 0;
-            flex-wrap: nowrap;            
-            text-align: center;
-            align-items: center;
-        }
-
-        /* Estilos para el sistema de licencia */
+        /* License dialog */
         .license-dialog {
             position: fixed;
             top: 0;
@@ -434,7 +398,7 @@
         }
 
         .license-content {
-            background-color: #0c0d19;
+            background-color: var(--background-secondary);
             padding: 20px;
             border-radius: 10px;
             width: 400px;
@@ -443,13 +407,13 @@
         }
 
         .license-title {
-            color: #fff;
+            color: var(--accent-primary);
             margin-top: 0;
             font-size: 1.5rem;
         }
 
         .license-description {
-            color: #dedede;
+            color: var(--text-secondary);
             margin-bottom: 20px;
         }
 
@@ -459,17 +423,17 @@
 
         .license-label {
             display: block;
-            color: #fff;
+            color: var(--text-primary);
             margin-bottom: 5px;
         }
 
         .license-input {
             width: 100%;
             padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #333;
-            background-color: #1e1e1e;
-            color: #fff;
+            border-radius: 10px;
+            border: 1px solid var(--ui-element);
+            background-color: var(--ui-element);
+            color: var(--text-primary);
             font-family: monospace;
             box-sizing: border-box;
         }
@@ -482,20 +446,20 @@
 
         .license-button {
             padding: 8px 16px;
-            border-radius: 5px;
+            border-radius: 10px;
             border: none;
             cursor: pointer;
             font-weight: bold;
         }
 
         .license-primary {
-            background-color: #fd9c0d;
-            color: #0c0d19;
+            background-color: var(--accent-primary);
+            color: var(--background-primary);
         }
 
         .license-secondary {
-            background-color: #333;
-            color: #fff;
+            background-color: var(--ui-element);
+            color: var(--text-primary);
         }
 
         .license-status {
@@ -509,8 +473,8 @@
         }
 
         .license-valid {
-            background-color: #16a34a;
-            color: white;
+            background-color: var(--accent-primary);
+            color: var(--background-primary);
         }
 
         .license-invalid {
@@ -519,28 +483,13 @@
             animation: pulse 2s infinite;
         }
 
-        .license-copy {
-            background-color: #333;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .license-result {
-            margin-top: 15px;
-            display: none;
-        }
-
         .license-toast {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
-            border-radius: 5px;
+            border-radius: 10px;
             color: white;
             z-index: 10000;
             opacity: 0;
@@ -548,7 +497,7 @@
         }
 
         .license-toast-success {
-            background-color: #16a34a;
+            background-color: var(--accent-primary);
         }
 
         .license-toast-error {
@@ -561,163 +510,179 @@
             100% { opacity: 1; }
         }
 
-.license-dialog {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
 
-    .license-content {
-      background-color: #222;
-      padding: 30px;
-      border-radius: 10px;
-      width: 80%;
-      max-width: 500px;
-      text-align: center;
-    }
+        /* Responsive styles */
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+            }
 
-    .license-title {
-      color: #e50914;
-      margin-top: 0;
-    }
+            #video-container {
+                width: 60%;
+                height: 100%;
+            }
 
-    .license-description {
-      color: #dedede;
-      margin-bottom: 20px;
-    }
+            .sidebar {
+                width: 40%;
+                flex-direction: row;
+                overflow-x: hidden;
+            }
 
-    .license-input-group {
-      margin-bottom: 15px;
-    }
+            .category-list-container {
+                width: 35%;
+                min-width: auto;
+                scrollbar-width: thin;
+            }
 
-    .license-label {
-      display: block;
-      color: #fff;
-      margin-bottom: 5px;
-    }
+            .channel-list-container {
+                width: 65%;
+                min-width: auto;
+            }
+        }
 
-    .license-input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      text-align: center;
-      background-color: #333;
-      color: white;
-    }
+        @media (max-width: 767px) {
+            #video-container {
+                height: 230px;
+            }
+        }
 
-    .license-button {
-      background-color: #e50914;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
 
-    .license-message {
-      margin-top: 15px;
-      color: #ff6b6b;
-      display: none;
-    }
+        ::-webkit-scrollbar-track {
+            background: var(--background-primary);
+        }
 
-    .license-status {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      z-index: 1000;
-    }
+        ::-webkit-scrollbar-thumb {
+            background: var(--ui-element);
+            border-radius: 4px;
+        }
 
-    .license-valid {
-      background-color: #16a34a;
-      color: white;
-    }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--ui-hover);
+        }
 
-    .license-invalid {
-      background-color: #e11d48;
-      color: white;
-      animation: pulse 2s infinite;
-    }
+        /* Player switch buttons */
+        .player-switch-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1001;
+            display: flex;
+            gap: 10px;
+        }
 
-    .license-toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      border-radius: 5px;
-      color: white;
-      z-index: 10000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
+        .player-switch-btn {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-    .license-toast-success {
-      background-color: #16a34a;
-    }
+        .player-switch-btn.active {
+            background-color: var(--accent-primary);
+            color: var(--background-primary);
+        }
 
-    .license-toast-error {
-      background-color: #e11d48;
-    }
+        .player-switch-btn:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
 
-    @keyframes pulse {
-      0% {
-        opacity: 1;
-      }
+        /* Reload button */
+        .reload-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 10;
+        }
 
-      50% {
-        opacity: 0.7;
-      }
+        .reload-button:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
 
-      100% {
-        opacity: 1;
-      }
-    }
+        .reload-button:active {
+            transform: scale(0.95);
+        }
+
+        .reload-button i {
+            transition: transform 0.5s;
+        }
+
+        .reload-button.loading i {
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <!-- Sistema de licencia -->
-  <div id="license-dialog" class="license-dialog" style="display: none;">
-    <div class="license-content">
-      <h2 class="license-title">Activar StreamFusion</h2>
-      <p class="license-description">Ingrese su clave de licencia para continuar</p>
-      <div class="license-input-group">
-        <label for="licenseKey" class="license-label">Clave de Licencia</label>
-        <input type="text" id="licenseKey" class="license-input" value="" placeholder="SF-XXXX-XXXX">
-      </div>
-      <div class="license-button-group">
-        <button id="activateButton" class="license-button">Activar</button>
-      </div>
-      <p id="license-message" class="license-message"></p>
+    <div id="license-dialog" class="license-dialog" style="display: none;">
+        <div class="license-content">
+            <h2 class="license-title">Activar StreamFusion</h2>
+            <p class="license-description">Ingrese su clave de licencia para continuar</p>
+            <div class="license-input-group">
+                <label for="licenseKey" class="license-label">Clave de Licencia</label>
+                <input type="text" id="licenseKey" class="license-input" value="" placeholder="SF-XXXX-XXXX">
+            </div>
+            <div class="license-button-group">
+                <button id="activateButton" class="license-button license-primary">Activar</button>
+            </div>
+            <p id="license-message" class="license-message" style="color: #e11d48; margin-top: 10px; display: none;"></p>
+        </div>
     </div>
-  </div>
-    <header class="header">
-        <a href="go:home" class="back-link"><i class="fas fa-chevron-left"></i></a>
-        <h1>StreamFusion</h1>
-        <div style="width: 20px;"></div> <!-- Espacio vacío para alinear el título -->
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <a href="go:home" class="back-link"><i class="fas fa-chevron-left"></i></a>
+        </div>
+        <div class="header-content">      	
+            <h1><span class="highlight">Stream</span><span class="secondary-highlight">Fusion</span></h1>
+        </div>
+        <div class="logo">
+            <a href="go:sr" class="report"><i class="fas fa-exclamation"></i></a>
+        </div>
     </header>
 
     <!-- Contenedor principal -->
     <div class="main-container">
         <!-- Contenedor del reproductor -->
         <div id="video-container">
+            <!-- Mensaje de inicio -->
+            <div id="start-message" class="start-message">
+                Selecciona un canal para comenzar
+            </div>
+
             <!-- Reproductor para HLS/MP4 -->
             <video id="video-player" class="player" autoplay playsinline></video>
 
             <!-- Reproductor para iframe -->
-            <iframe id="iframe-player" class="player" sandbox="allow-scripts allow-same-origin" scrolling="no" allowfullscreen="true" allowfullscreen="true" loading="lazy" frameborder="0"  webkitallowfullscreen="true" mozallowfullscreen="true" msExitFullscreen="true" allowfullscreen="true" allow="encrypted-media" scrolling="no" allow="fullscreen"></iframe>
+            <iframe id="iframe-player" class="player" sandbox="allow-scripts allow-same-origin" scrolling="no" allowfullscreen="true" loading="lazy" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" msExitFullscreen="true" allow="encrypted-media"></iframe>
+            
             <!-- Spinner -->
             <div id="spinner" class="spinner" style="display: none;"></div>
 
@@ -726,433 +691,45 @@
                 No se pudo reproducir el canal.<br>Repórtalo para que sea actualizado.
             </div>
 
+            <!-- Botón de recarga -->
+            <button id="reload-button" class="reload-button" title="Recargar video" style="display: none;">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+
+            <!-- Botones de cambio de reproductor -->
+            <div class="player-switch-container" style="display: none;">
+                <button id="player1-btn" class="player-switch-btn active">Reproductor 1</button>
+                <button id="player2-btn" class="player-switch-btn">Reproductor 2</button>
+            </div>
+
             <!-- Botón de pantalla completa -->
-            <button class="fullscreen-btn" onclick="toggleFullscreen()">Pantalla Completa</button>
+            <button id="fullscreen-btn" class="fullscreen-btn">
+                <i class="fas fa-expand"></i>
+            </button>
 
             <!-- Botón de menú en pantalla completa -->
             <div class="fullscreen-menu" id="fullscreen-menu">
-                <i class="fas fa-bars" onclick="toggleMenu()"></i>
+                <i class="fas fa-bars"></i>
             </div>
 
             <!-- Overlay para el menú en pantalla completa -->
-            <div class="fullscreen-overlay" id="fullscreen-overlay" onclick="hideOverlay(event)">
-                <div class="overlay-content" id="overlay-content" onclick="stopPropagation(event)">
+            <div class="fullscreen-overlay" id="fullscreen-overlay">
+                <div class="overlay-content" id="overlay-content">
                     <!-- Columna de categorías -->
                     <div class="category-column">
                         <h2>Categorías</h2>
                         <ul class="category-list" id="overlay-category-list">
-                            <li><button onclick="filterChannels('all')">Todos</button></li>
-                			<li><button onclick="filterChannels('Argentina')">Argentina</button></li>
-                			<li><button onclick="filterChannels('Colombia')">Colombia</button></li>
-                			<li><button onclick="filterChannels('España')">España</button></li>
-                			<li><button onclick="filterChannels('Mexico')">Mexico</button></li>
-                			<li><button onclick="filterChannels('Venezuela')">Venezuela</button></li>
-                			<li><button onclick="filterChannels('Cristiano')">Cristiano</button></li>
-              				<li><button onclick="filterChannels('Musica')">Musica</button></li>
-              				<li><button onclick="filterChannels('Noticias')">Noticias</button></li>
-              				<li><button onclick="filterChannels('Deportes')">Deportes</button></li>
-              				<li><button onclick="filterChannels('Infantil')">Infantil</button></li>
-              				<li><button onclick="filterChannels('Entretenimiento')">Entretenimiento</button></li>
-              				<li><button onclick="filterChannels('Novelas')">Novelas</button></li>
-              				<li><button onclick="filterChannels('Peliculas')">Peliculas</button></li>
+                            <!-- Las categorías se cargarán dinámicamente -->
                         </ul>
                     </div>
-                  
+                    
                     <!-- Columna de canales -->
                     <div class="channel-column">
                         <!-- Buscador en el overlay -->
-                        <input type="text" class="search-bar" id="overlay-search-bar" placeholder="Buscar canal..." oninput="filterChannelsBySearch('overlay')">
+                        <input type="text" class="search-bar" id="overlay-search-bar" placeholder="Buscar canal...">
 
                         <div class="channel-list" id="overlay-channel-list">
-                            <!-- ESPN 3 (iframe) -->
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/t5v0m')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Caracol_Televisi%C3%B3n_logo.svg/512px-Caracol_Televisi%C3%B3n_logo.svg.png');"></div>
-    <div class="channel-name">Caracol TV</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/caracol.html')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Caracol_Internacional_2023.png');"></div>
-    <div class="channel-name">Caracol Internacional</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/rcn.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/rcn.webp');"></div>
-    <div class="channel-name">RCN</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/oy3eFD1QxS9Ga5f')">
-    <div class="channel-logo" style="background-image: url('https://canal1.com.co/icons/ios/152.png');"></div>
-    <div class="channel-name">Canal UNO</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/JF870ZqHUoBLcXx')">
-    <div class="channel-logo" style="background-image: url('https://telepacifico.com/dev/wp-content/uploads/2019/06/favicon.png');"></div>
-    <div class="channel-name">Telepacífico</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/Rvm56FOSkgICV2')">
-    <div class="channel-logo" style="background-image: url('https://www.senalcolombia.tv/themes/custom/colombia_subtheme/img/barra_principal/logo_mobile.png');"></div>
-    <div class="channel-name">Señal Colombia</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('hls', 'https://8.tutl24.xyz/hls/SKLUFNN80369911.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.telegratishd.com/imge/cnnespanol.png');"></div>
-    <div class="channel-name">CNN Español</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/beinlaliga.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/beinlaliga.png');"></div>
-    <div class="channel-name">BEIN LA LIGA</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/daznf1.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/daznf1.png');"></div>
-    <div class="channel-name">DAZNF1</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn.webp');"></div>
-    <div class="channel-name">ESPN Argentina</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn2.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn2.webp');"></div>
-    <div class="channel-name">ESPN 2</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn3.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn3.webp');"></div>
-    <div class="channel-name">ESPN 3</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn4.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn4.webp');"></div>
-    <div class="channel-name">ESPN 4</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn5.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn5.png');"></div>
-    <div class="channel-name">ESPN 5</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn6.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn6.png');"></div>
-    <div class="channel-name">ESPN 6</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn7.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn7.png');"></div>
-    <div class="channel-name">ESPN 7</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://enx.gdplayertv.to/embed/espn-deportes/')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espndeportes.png');"></div>
-    <div class="channel-name">ESPN Deportes</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/E65f8')">
-    <div class="channel-logo" style="background-image: url('https://api.tipotv.com/uploads/thumbnail_win_sports_plus_e31602c966_d029ba5370.webp');"></div>
-    <div class="channel-name">Win Sports +</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://enx.gdplayertv.to/embed/espn-premium/')">
-    <div class="channel-logo" style="background-image: url('https://espnpressroom.com/latinamerica/files/2022/05/ESPN-Premium-.jpg');"></div>
-    <div class="channel-name">ESPN Premium</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espnmexico.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn.png');"></div>
-    <div class="channel-name">ESPN México</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://gol12.com/online/canales.php?stream=tntsportar')">
-    <div class="channel-logo" style="background-image: url('https://futbollibrego.pe//img/logo-canal/tnt_sports.webp');"></div>
-    <div class="channel-name">TNT Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('mpd', 'https://8.tutl24.xyz/dash/STbf8e8e95160e2a0.mpd')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/tudn.png');"></div>
-    <div class="channel-name">TUDN</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('hls', 'https://8.tutl24.xyz/live/STb88a289438c3944.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://cnbl-cdn.bamgrid.com/assets/478bf74ef5ffc184e7c96808eef869a4ca967cbcc5a8db8f7e3c4005d93bbfd5/original');"></div>
-    <div class="channel-name">Disney Plus Sports</div>
-</div>
-<div class="channel-item" data-category="Cristiano" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/7yWUbOt8i1QD-3l')">
-    <div class="channel-logo" style="background-image: url('https://yt3.googleusercontent.com/3h0z4D1bWI__KncOyLytL7AN1Vsp4qkOVrJSxa1ABqTK38tMSrPQ_XNV55vrGTtObsm-_XV0vg=s900-c-k-c0x00ffffff-no-rj');"></div>
-    <div class="channel-name">Casa Sobre La Roca</div>
-</div>
-<div class="channel-item" data-category="Cristiano" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/7lebX1zaoWE3d6c')">
-    <div class="channel-logo" style="background-image: url('https://betheltv.tv/media/2022/12/logo_bethel.png');"></div>
-    <div class="channel-name">BethelTV</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/9zlMEQ-Td2NIX3b')">
-    <div class="channel-logo" style="background-image: url('https://www.cxtv.com.br/img/Tvs/Logo/webp-m/41c870183ed012aa991e0986fc3b561a.webp');"></div>
-    <div class="channel-name">TeleSur</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('hls', 'https://ztnr.rtve.es/ztnr/1694255.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.cxtv.com.br/img/Tvs/Logo/webp-m/701b2da0ad30234ee2844bc96021390c.webp');"></div>
-    <div class="channel-name">TVE-24h</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/goltv.html')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a3/GolTV_logo.svg');"></div>
-    <div class="channel-name">GolTV</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/directvsports.html')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/dsports.webp');"></div>
-    <div class="channel-name">DirecTV Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/directvsports2.html')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/dsports2.webp');"></div>
-    <div class="channel-name">DirecTV Sports 2</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/directvsportsplus.html')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/dsportsplus.webp');"></div>
-    <div class="channel-name">DirecTV Sports Plus</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed/nick.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/nick.png');"></div>
-    <div class="channel-name">Nickelodeon</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/disneychannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/disneychannel.png');"></div>
-    <div class="channel-name">Disney Channel</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cartoonnetwork.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cartoonnetwork.png');"></div>
-    <div class="channel-name">Cartoon Network</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tooncast.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tooncast.png');"></div>
-    <div class="channel-name">Tooncast</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cartoonito.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cartoonito.png');"></div>
-    <div class="channel-name">Cartoonito</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/disneyjr.html')">
-    <div class="channel-logo" style="background-image: url('https://www.televisiongratishd.com/imge/disneyjr.png');"></div>
-    <div class="channel-name">Disney Junior</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/bobesponja.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/bobesponja.png');"></div>
-    <div class="channel-name">Bob Esponja 24/7</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/dragonballsuper.html')">
-    <div class="channel-logo" style="background-image: url('https://i.pngimg.me/thumb/f/720/comdlpng6935249.jpg');"></div>
-    <div class="channel-name">DBZ 24/7</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/padrinosmagicos.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/padrinosmagicos.png');"></div>
-    <div class="channel-name">Los Padrinos Magicos 24/7</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tnt.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tnt.png');"></div>
-    <div class="channel-name">TNT</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tntseries.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tntseries.png');"></div>
-    <div class="channel-name">TNT Series</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cinemax.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cinemax.png');"></div>
-    <div class="channel-name">Cinemax</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/starchannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/starchannel.png');"></div>
-    <div class="channel-name">Star Channel</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/axn.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/axn.png');"></div>
-    <div class="channel-name">AXN</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('mpd', 'https://latamvosliveclarovideo.akamaized.net/Content/DASH_DASH_FK/Live/Channel(HBO_HD_MX)/manifest.mpd')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/hbo.webp');"></div>
-    <div class="channel-name">HBO</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://streamplayweb.com/tv/hbo2.php')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/hbo2.webp');"></div>
-    <div class="channel-name">HBO 2</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://streamplayweb.com/tv/hboplus.php')">
-    <div class="channel-logo" style="background-image: url('https://tele-libre.com/img/hboplus.webp');"></div>
-    <div class="channel-name">HBO Plus</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cinecanal.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cinecanal.png');"></div>
-    <div class="channel-name">Cinecanal</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/space.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/space2.png');"></div>
-    <div class="channel-name">Space</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/golden.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/golden.png');"></div>
-    <div class="channel-name">Golden</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/goldenplus.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/goldenplus.png');"></div>
-    <div class="channel-name">Golden Plus</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/goldenpremier.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/goldenpremier.png');"></div>
-    <div class="channel-name">Golden Premier</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tycsports.html')">
-    <div class="channel-logo" style="background-image: url('https://www.tvplusgratis2.com/imge/tycsports.png');"></div>
-    <div class="channel-name">TyC Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/golperu.html')">
-    <div class="channel-logo" style="background-image: url('https://cuevana3hd.world/img/gol_peru.webp');"></div>
-    <div class="channel-name">GOLPERU</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://gol12.com/online/canales.php?stream=l1max')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/liga1max.webp');"></div>
-    <div class="channel-name">Liga 1 MAX</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsports.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/foxsports.png');"></div>
-    <div class="channel-name">Fox Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsports2.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/foxsports2.png');"></div>
-    <div class="channel-name">Fox Sports 2</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsports3.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/foxsports3.png');"></div>
-    <div class="channel-name">Fox Sports 3</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsportspremium.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/foxsportspremium.png');"></div>
-    <div class="channel-name">Fox Sports Premium</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/movistarlaliga.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/movistarlaliga.png');"></div>
-    <div class="channel-name">Movistar La Liga</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/vHeB-krnyNlTxKE')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/televida.webp');"></div>
-    <div class="channel-name">Televida</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/telemundopuertorico.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/telemundopuertorico.png');"></div>
-    <div class="channel-name">Telemundo Puerto Rico</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('hls', 'https://8.tutl24.xyz/hls/SKVIPOX58638582.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/telemundo51.png');"></div>
-    <div class="channel-name">Telemundo 51</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/casocerrado.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/casocerrado.png');"></div>
-    <div class="channel-name">Caso Cerrado 24/7</div>
-</div>
-<div class="channel-item" data-category="Novelas" onclick="playChannel('iframe', 'https://tele-libre.com/en-vivo-online/pasiones/embed.php')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/pasiones.png');"></div>
-    <div class="channel-name">Pasiones</div>
-</div>
-<div class="channel-item" data-category="Ecuador" onclick="playChannel('iframe', 'https://canvaris-op6-varis.glitch.me/eeecuuuaaa1.html')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f2/Ecuavisa_Logo_2019.png');"></div>
-    <div class="channel-name">Ecuavisa</div>
-</div>
-<div class="channel-item" data-category="Novelas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tlnovelas.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tlnovelas.png');"></div>
-    <div class="channel-name">tlnovelas</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/warnerchannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/warnerbrostv.png');"></div>
-    <div class="channel-name">Warner Channel</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/discoverychannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/discoverychannel.png');"></div>
-    <div class="channel-name">Discovery Channel</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/discoveryscience.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/discoveryscience.png');"></div>
-    <div class="channel-name">Discovery Science</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://live.sdfgnksbounce.com/futbollibre.php?id=97_#')">
-    <div class="channel-logo" style="background-image: url('https://www.clarogratis.com/imge/hyh.webp');"></div>
-    <div class="channel-name">hyh</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/history.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/history.png');"></div>
-    <div class="channel-name">History</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/history2.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/history2.png');"></div>
-    <div class="channel-name">History 2</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/animalplanet.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/animalplanet.png');"></div>
-    <div class="channel-name">Animal Planet</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/natgeo.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/natgeo.png');"></div>
-    <div class="channel-name">Nat Geo</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/NbpkLDdgKVZti23')">
-    <div class="channel-logo" style="background-image: url('https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=132,fit=crop,q=95/Yg2O5n2xkwcBl04M/logo-letras-stz-telebista-blanco-YrD9Xep4Wns5VV25.png');"></div>
-    <div class="channel-name">STZ Telebista</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/DOWmQKlIf9jTNh')">
-    <div class="channel-logo" style="background-image: url('https://i.imgur.com/rbJrmPw.png');"></div>
-    <div class="channel-name">Sol Musica</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('hls', 'https://live-evg13.tv360.bitel.com.pe/hls/tltv.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.televisiongratishd2.com/imge/toplatino.png');"></div>
-  <div class="channel-name">TOP Latino</div>
-</div> 
-  <div class="channel-item" data-category="Entretenimiento" onclick="playChannel('frame', 'https://unlimplayer.top/embed/qUGPAkty7H9Dv0a')">
-    <div class="channel-logo" style="background-image: url('https://www.dw.com/images/icons/favicon-96x96.png');"></div>
-    <div class="channel-name">DW</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/afizzionados.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/tvcs.webp');"></div>
-    <div class="channel-name">TVC Deportes</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('hls', 'https://epg.provider.plex.tv/library/parts/608049aefa2b8ae93c2c3b2f-6018913ea15130002b284191.m3u8?includeAllStreams=1&X-Plex-Product=Plex+Mediaverse&X-Plex-Token=xhRMAXCRaJsH7AWjXiYy')">
-    <div class="channel-logo" style="background-image: url('https://images.plex.tv/photo?size=medium-360&scale=2&url=https%3A%2F%2Fprovider-static.plex.tv%2Fepg%2Fcms%2Fproduction%2F7267f8e7-62ee-4939-bf12-d096673571b9%2Flabocinalatina_artwork_horizontal_-_Jordan_Warkol.jpg');"></div>
-    <div class="channel-name">FreeTV Hits</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('hls', 'https://epg.provider.plex.tv/library/parts/608049aefa2b8ae93c2c3b2f-631932e2f6672ff675ee5ec0.m3u8?includeAllStreams=1&X-Plex-Product=Plex+Mediaverse&X-Plex-Token=xhRMAXCRaJsH7AWjXiYy')">
-    <div class="channel-logo" style="background-image: url('https://provider-static.plex.tv/epg/cms/production/1fb210a8-0d8a-47b5-84da-f6457988f8cd/labocinalatina_logo_light_-_Jordan_Warkol.png');"></div>
-    <div class="channel-name">La Bocina Latina</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('hls', 'https://c054f53413c54c1d9214a6156a264c0d.mediatailor.us-west-2.amazonaws.com/v1/manifest/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-46-AFV_ES-PLEX/6999db16-6b7b-45b6-9a12-d4d12855b4ba/0.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://i.imgur.com/HUK4WXC.png');"></div>
-    <div class="channel-name">AFV</div>
-</div>
-<div class="channel-item" data-category="Argentina" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/wyKQbtS82m-TdgL')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/eltrece.png');"></div>
-    <div class="channel-name">el trece</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/7sQ1M')">
-    <div class="channel-logo" style="background-image: url('https://www.cxtv.com.br/img/Tvs/Logo/webp-m/26c5a30029b81339ef17a02aa420f64c.webp');"></div>
-    <div class="channel-name">RT en Español</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/aztecauno.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/aztecauno.png');"></div>
-    <div class="channel-name">Azteca UNO</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/univision.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/univision.png');"></div>
-    <div class="channel-name">Univision</div>
-</div>
-<div class="channel-item" data-category="Mexico" onclick="playChannel('hls', 'https://7.tutl24.xyz/live/ST66eaaebed431889.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.televisiongratishd.com/imge/unicable.png');"></div>
-    <div class="channel-name">Unicable</div>
-</div>
-<div class="channel-item" data-category="Mexico" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/azteca7.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/azteca7.png');"></div>
-    <div class="channel-name">Azteca 7</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/Y19tC')">
-    <div class="channel-logo" style="background-image: url('https://www.skysports.com/core/img/channels/Sky-Sports-Logo-transparent.svg');"></div>
-    <div class="channel-name">Sky Sports La Liga</div>
-</div>
-<div class="channel-item" data-category="Mexico" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/canal5.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/canal5.png');"></div>
-    <div class="channel-name">Canal 5</div>
-</div>
-<div class="channel-item" data-category="Novelas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/lasestrellas.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/lasestrellas.png');"></div>
-    <div class="channel-name">Las Estrellas</div>
-</div>
-<div class="channel-item" data-category="Argentina" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/telefe.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/telefe.png');"></div>
-    <div class="channel-name">Telecafe</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/americatv.html')">
-    <div class="channel-logo" style="background-image: url('https://www.americatv.com.pe/icons/apple-touch-icon.png');"></div>
-    <div class="channel-name">America TV</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/latina.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/latinape.webp');"></div>
-    <div class="channel-name">Latina</div>
-</div>
-<div class="channel-item" data-category="Peru" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/GKUsBbSrp4Riwqd')">
-    <div class="channel-logo" style="background-image: url('https://www.caracolatv.cl/wp-content/uploads/2022/11/cropped-LOGO-CARACOLA-05-1-300x169.png');"></div>
-    <div class="channel-name">Caracola TV</div>
-</div>
+                            <!-- Los canales se cargarán dinámicamente -->
                         </div>
                     </div>
                 </div>
@@ -1165,994 +742,887 @@
             <div class="category-list-container">
                 <h2>Categorías</h2>
                 <ul class="category-list" id="category-list">
-                    		<li><button onclick="filterChannels('all')">Todos</button></li>
-                			<li><button onclick="filterChannels('Argentina')">Argentina</button></li>
-                			<li><button onclick="filterChannels('Colombia')">Colombia</button></li>
-                			<li><button onclick="filterChannels('España')">España</button></li>
-                			<li><button onclick="filterChannels('Mexico')">Mexico</button></li>
-                			<li><button onclick="filterChannels('Venezuela')">Venezuela</button></li>
-                			<li><button onclick="filterChannels('Cristiano')">Cristiano</button></li>
-              				<li><button onclick="filterChannels('Musica')">Musica</button></li>
-              				<li><button onclick="filterChannels('Noticias')">Noticias</button></li>
-              				<li><button onclick="filterChannels('Deportes')">Deportes</button></li>
-              				<li><button onclick="filterChannels('Infantil')">Infantil</button></li>
-              				<li><button onclick="filterChannels('Entretenimiento')">Entretenimiento</button></li>
-              				<li><button onclick="filterChannels('Novelas')">Novelas</button></li>
-              				<li><button onclick="filterChannels('Peliculas')">Peliculas</button></li>
+                    <!-- Las categorías se cargarán dinámicamente -->
                 </ul>
             </div>
 
             <!-- Contenedor de canales -->
             <div class="channel-list-container">
                 <!-- Buscador en la barra lateral -->
-                <input type="text" class="search-bar" id="sidebar-search-bar" placeholder="Buscar canal..." oninput="filterChannelsBySearch('sidebar')">
+                <input type="text" class="search-bar" id="sidebar-search-bar" placeholder="Buscar canal...">
 
                 <h2>Canales</h2>
                 <div class="channel-list" id="channel-list">
-                    <!-- ESPN 3 (iframe) -->
-<div class="channel-item" data-category="Colombia" onclick="playChannel('hls', 'https://mdstrm.com/live-stream-playlist/574463697b9817cf0886fc17.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Caracol_Televisi%C3%B3n_logo.svg/512px-Caracol_Televisi%C3%B3n_logo.svg.png');"></div>
-    <div class="channel-name">Caracol TV</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/caracol.html')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Caracol_Internacional_2023.png');"></div>
-    <div class="channel-name">Caracol Internacional</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/rcn.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/rcn.webp');"></div>
-    <div class="channel-name">RCN</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/oy3eFD1QxS9Ga5f')">
-    <div class="channel-logo" style="background-image: url('https://canal1.com.co/icons/ios/152.png');"></div>
-    <div class="channel-name">Canal UNO</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/JF870ZqHUoBLcXx')">
-    <div class="channel-logo" style="background-image: url('https://telepacifico.com/dev/wp-content/uploads/2019/06/favicon.png');"></div>
-    <div class="channel-name">Telepacífico</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/Rvm56FOSkgICV2')">
-    <div class="channel-logo" style="background-image: url('https://www.senalcolombia.tv/themes/custom/colombia_subtheme/img/barra_principal/logo_mobile.png');"></div>
-    <div class="channel-name">Señal Colombia</div>
-</div>
-<div class="channel-item" data-category="Colombia" onclick="playChannel('hls', 'https://8.tutl24.xyz/hls/SKLUFNN80369911.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.telegratishd.com/imge/cnnespanol.png');"></div>
-    <div class="channel-name">CNN Español</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/beinlaliga.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/beinlaliga.png');"></div>
-    <div class="channel-name">BEIN LA LIGA</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/daznf1.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/daznf1.png');"></div>
-    <div class="channel-name">DAZNF1</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn.webp');"></div>
-    <div class="channel-name">ESPN Argentina</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn2.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn2.webp');"></div>
-    <div class="channel-name">ESPN 2</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn3.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn3.webp');"></div>
-    <div class="channel-name">ESPN 3</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn4.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net//img/espn4.webp');"></div>
-    <div class="channel-name">ESPN 4</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn5.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn5.png');"></div>
-    <div class="channel-name">ESPN 5</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn6.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn6.png');"></div>
-    <div class="channel-name">ESPN 6</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espn7.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn7.png');"></div>
-    <div class="channel-name">ESPN 7</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://enx.gdplayertv.to/embed/espn-deportes/')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espndeportes.png');"></div>
-    <div class="channel-name">ESPN Deportes</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/E65f8')">
-    <div class="channel-logo" style="background-image: url('https://api.tipotv.com/uploads/thumbnail_win_sports_plus_e31602c966_d029ba5370.webp');"></div>
-    <div class="channel-name">Win Sports +</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://enx.gdplayertv.to/embed/espn-premium/')">
-    <div class="channel-logo" style="background-image: url('https://espnpressroom.com/latinamerica/files/2022/05/ESPN-Premium-.jpg');"></div>
-    <div class="channel-name">ESPN Premium</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/espnmexico.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/espn.png');"></div>
-    <div class="channel-name">ESPN México</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://gol12.com/online/canales.php?stream=tntsportar')">
-    <div class="channel-logo" style="background-image: url('https://futbollibrego.pe//img/logo-canal/tnt_sports.webp');"></div>
-    <div class="channel-name">TNT Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('mpd', 'https://8.tutl24.xyz/dash/STbf8e8e95160e2a0.mpd')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/tudn.png');"></div>
-    <div class="channel-name">TUDN</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('hls', 'https://8.tutl24.xyz/live/STb88a289438c3944.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://cnbl-cdn.bamgrid.com/assets/478bf74ef5ffc184e7c96808eef869a4ca967cbcc5a8db8f7e3c4005d93bbfd5/original');"></div>
-    <div class="channel-name">Disney Plus Sports</div>
-</div>
-<div class="channel-item" data-category="Cristiano" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/7yWUbOt8i1QD-3l')">
-    <div class="channel-logo" style="background-image: url('https://yt3.googleusercontent.com/3h0z4D1bWI__KncOyLytL7AN1Vsp4qkOVrJSxa1ABqTK38tMSrPQ_XNV55vrGTtObsm-_XV0vg=s900-c-k-c0x00ffffff-no-rj');"></div>
-    <div class="channel-name">Casa Sobre La Roca</div>
-</div>
-<div class="channel-item" data-category="Cristiano" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/7lebX1zaoWE3d6c')">
-    <div class="channel-logo" style="background-image: url('https://betheltv.tv/media/2022/12/logo_bethel.png');"></div>
-    <div class="channel-name">BethelTV</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/9zlMEQ-Td2NIX3b')">
-    <div class="channel-logo" style="background-image: url('https://www.cxtv.com.br/img/Tvs/Logo/webp-m/41c870183ed012aa991e0986fc3b561a.webp');"></div>
-    <div class="channel-name">TeleSur</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('hls', 'https://ztnr.rtve.es/ztnr/1694255.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.cxtv.com.br/img/Tvs/Logo/webp-m/701b2da0ad30234ee2844bc96021390c.webp');"></div>
-    <div class="channel-name">TVE-24h</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/goltv.html')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a3/GolTV_logo.svg');"></div>
-    <div class="channel-name">GolTV</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/directvsports.html')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/dsports.webp');"></div>
-    <div class="channel-name">DirecTV Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/directvsports2.html')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/dsports2.webp');"></div>
-    <div class="channel-name">DirecTV Sports 2</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/directvsportsplus.html')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/dsportsplus.webp');"></div>
-    <div class="channel-name">DirecTV Sports Plus</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed/nick.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/nick.png');"></div>
-    <div class="channel-name">Nickelodeon</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/disneychannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/disneychannel.png');"></div>
-    <div class="channel-name">Disney Channel</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cartoonnetwork.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cartoonnetwork.png');"></div>
-    <div class="channel-name">Cartoon Network</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tooncast.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tooncast.png');"></div>
-    <div class="channel-name">Tooncast</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cartoonito.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cartoonito.png');"></div>
-    <div class="channel-name">Cartoonito</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/disneyjr.html')">
-    <div class="channel-logo" style="background-image: url('https://www.televisiongratishd.com/imge/disneyjr.png');"></div>
-    <div class="channel-name">Disney Junior</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/bobesponja.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/bobesponja.png');"></div>
-    <div class="channel-name">Bob Esponja 24/7</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/dragonballsuper.html')">
-    <div class="channel-logo" style="background-image: url('https://i.pngimg.me/thumb/f/720/comdlpng6935249.jpg');"></div>
-    <div class="channel-name">DBZ 24/7</div>
-</div>
-<div class="channel-item" data-category="Infantil" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/padrinosmagicos.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/padrinosmagicos.png');"></div>
-    <div class="channel-name">Los Padrinos Magicos 24/7</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tnt.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tnt.png');"></div>
-    <div class="channel-name">TNT</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tntseries.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tntseries.png');"></div>
-    <div class="channel-name">TNT Series</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cinemax.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cinemax.png');"></div>
-    <div class="channel-name">Cinemax</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/starchannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/starchannel.png');"></div>
-    <div class="channel-name">Star Channel</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/axn.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/axn.png');"></div>
-    <div class="channel-name">AXN</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('mpd', 'https://latamvosliveclarovideo.akamaized.net/Content/DASH_DASH_FK/Live/Channel(HBO_HD_MX)/manifest.mpd')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/hbo.webp');"></div>
-    <div class="channel-name">HBO</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://streamplayweb.com/tv/hbo2.php')">
-    <div class="channel-logo" style="background-image: url('https://tvlibreonline.net/img/hbo2.webp');"></div>
-    <div class="channel-name">HBO 2</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://streamplayweb.com/tv/hboplus.php')">
-    <div class="channel-logo" style="background-image: url('https://tele-libre.com/img/hboplus.webp');"></div>
-    <div class="channel-name">HBO Plus</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/cinecanal.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/cinecanal.png');"></div>
-    <div class="channel-name">Cinecanal</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/space.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/space2.png');"></div>
-    <div class="channel-name">Space</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/golden.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/golden.png');"></div>
-    <div class="channel-name">Golden</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/goldenplus.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/goldenplus.png');"></div>
-    <div class="channel-name">Golden Plus</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/goldenpremier.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/goldenpremier.png');"></div>
-    <div class="channel-name">Golden Premier</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tycsports.html')">
-    <div class="channel-logo" style="background-image: url('https://www.tvplusgratis2.com/imge/tycsports.png');"></div>
-    <div class="channel-name">TyC Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/golperu.html')">
-    <div class="channel-logo" style="background-image: url('https://cuevana3hd.world/img/gol_peru.webp');"></div>
-    <div class="channel-name">GOLPERU</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://gol12.com/online/canales.php?stream=l1max')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/liga1max.webp');"></div>
-    <div class="channel-name">Liga 1 MAX</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsports.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/foxsports.png');"></div>
-    <div class="channel-name">Fox Sports</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsports2.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/foxsports2.png');"></div>
-    <div class="channel-name">Fox Sports 2</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsports3.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/foxsports3.png');"></div>
-    <div class="channel-name">Fox Sports 3</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/foxsportspremium.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/foxsportspremium.png');"></div>
-    <div class="channel-name">Fox Sports Premium</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/movistarlaliga.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/movistarlaliga.png');"></div>
-    <div class="channel-name">Movistar La Liga</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/vHeB-krnyNlTxKE')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/televida.webp');"></div>
-    <div class="channel-name">Televida</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/telemundopuertorico.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/telemundopuertorico.png');"></div>
-    <div class="channel-name">Telemundo Puerto Rico</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('hls', 'https://8.tutl24.xyz/hls/SKVIPOX58638582.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/telemundo51.png');"></div>
-    <div class="channel-name">Telemundo 51</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/casocerrado.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/casocerrado.png');"></div>
-    <div class="channel-name">Caso Cerrado 24/7</div>
-</div>
-<div class="channel-item" data-category="Novelas" onclick="playChannel('iframe', 'https://tele-libre.com/en-vivo-online/pasiones/embed.php')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/pasiones.png');"></div>
-    <div class="channel-name">Pasiones</div>
-</div>
-<div class="channel-item" data-category="Ecuador" onclick="playChannel('iframe', 'https://canvaris-op6-varis.glitch.me/eeecuuuaaa1.html')">
-    <div class="channel-logo" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f2/Ecuavisa_Logo_2019.png');"></div>
-    <div class="channel-name">Ecuavisa</div>
-</div>
-<div class="channel-item" data-category="Novelas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/tlnovelas.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/tlnovelas.png');"></div>
-    <div class="channel-name">tlnovelas</div>
-</div>
-<div class="channel-item" data-category="Peliculas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/warnerchannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/warnerbrostv.png');"></div>
-    <div class="channel-name">Warner Channel</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/discoverychannel.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/discoverychannel.png');"></div>
-    <div class="channel-name">Discovery Channel</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/discoveryscience.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/discoveryscience.png');"></div>
-    <div class="channel-name">Discovery Science</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://live.sdfgnksbounce.com/futbollibre.php?id=97_#')">
-    <div class="channel-logo" style="background-image: url('https://www.clarogratis.com/imge/hyh.webp');"></div>
-    <div class="channel-name">hyh</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/history.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/history.png');"></div>
-    <div class="channel-name">History</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/history2.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/history2.png');"></div>
-    <div class="channel-name">History 2</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/animalplanet.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/animalplanet.png');"></div>
-    <div class="channel-name">Animal Planet</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/natgeo.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/natgeo.png');"></div>
-    <div class="channel-name">Nat Geo</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/NbpkLDdgKVZti23')">
-    <div class="channel-logo" style="background-image: url('https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=132,fit=crop,q=95/Yg2O5n2xkwcBl04M/logo-letras-stz-telebista-blanco-YrD9Xep4Wns5VV25.png');"></div>
-    <div class="channel-name">STZ Telebista</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/DOWmQKlIf9jTNh')">
-    <div class="channel-logo" style="background-image: url('https://i.imgur.com/rbJrmPw.png');"></div>
-    <div class="channel-name">Sol Musica</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('hls', 'https://live-evg13.tv360.bitel.com.pe/hls/tltv.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.televisiongratishd2.com/imge/toplatino.png');"></div>
-  <div class="channel-name">TOP Latino</div>
-</div> 
-  <div class="channel-item" data-category="Entretenimiento" onclick="playChannel('frame', 'https://unlimplayer.top/embed/qUGPAkty7H9Dv0a')">
-    <div class="channel-logo" style="background-image: url('https://www.dw.com/images/icons/favicon-96x96.png');"></div>
-    <div class="channel-name">DW</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/afizzionados.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.net/img/tvcs.webp');"></div>
-    <div class="channel-name">TVC Deportes</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('hls', 'https://epg.provider.plex.tv/library/parts/608049aefa2b8ae93c2c3b2f-6018913ea15130002b284191.m3u8?includeAllStreams=1&X-Plex-Product=Plex+Mediaverse&X-Plex-Token=xhRMAXCRaJsH7AWjXiYy')">
-    <div class="channel-logo" style="background-image: url('https://images.plex.tv/photo?size=medium-360&scale=2&url=https%3A%2F%2Fprovider-static.plex.tv%2Fepg%2Fcms%2Fproduction%2F7267f8e7-62ee-4939-bf12-d096673571b9%2Flabocinalatina_artwork_horizontal_-_Jordan_Warkol.jpg');"></div>
-    <div class="channel-name">FreeTV Hits</div>
-</div>
-<div class="channel-item" data-category="Musica" onclick="playChannel('hls', 'https://epg.provider.plex.tv/library/parts/608049aefa2b8ae93c2c3b2f-631932e2f6672ff675ee5ec0.m3u8?includeAllStreams=1&X-Plex-Product=Plex+Mediaverse&X-Plex-Token=xhRMAXCRaJsH7AWjXiYy')">
-    <div class="channel-logo" style="background-image: url('https://provider-static.plex.tv/epg/cms/production/1fb210a8-0d8a-47b5-84da-f6457988f8cd/labocinalatina_logo_light_-_Jordan_Warkol.png');"></div>
-    <div class="channel-name">La Bocina Latina</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('hls', 'https://c054f53413c54c1d9214a6156a264c0d.mediatailor.us-west-2.amazonaws.com/v1/manifest/ba62fe743df0fe93366eba3a257d792884136c7f/LINEAR-46-AFV_ES-PLEX/6999db16-6b7b-45b6-9a12-d4d12855b4ba/0.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://i.imgur.com/HUK4WXC.png');"></div>
-    <div class="channel-name">AFV</div>
-</div>
-<div class="channel-item" data-category="Argentina" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/wyKQbtS82m-TdgL')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/eltrece.png');"></div>
-    <div class="channel-name">el trece</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/7sQ1M')">
-    <div class="channel-logo" style="background-image: url('https://www.cxtv.com.br/img/Tvs/Logo/webp-m/26c5a30029b81339ef17a02aa420f64c.webp');"></div>
-    <div class="channel-name">RT en Español</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/aztecauno.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/aztecauno.png');"></div>
-    <div class="channel-name">Azteca UNO</div>
-</div>
-<div class="channel-item" data-category="Noticias" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/univision.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/univision.png');"></div>
-    <div class="channel-name">Univision</div>
-</div>
-<div class="channel-item" data-category="Mexico" onclick="playChannel('hls', 'https://7.tutl24.xyz/live/ST66eaaebed431889.m3u8')">
-    <div class="channel-logo" style="background-image: url('https://www.televisiongratishd.com/imge/unicable.png');"></div>
-    <div class="channel-name">Unicable</div>
-</div>
-<div class="channel-item" data-category="Mexico" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/azteca7.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/azteca7.png');"></div>
-    <div class="channel-name">Azteca 7</div>
-</div>
-<div class="channel-item" data-category="Deportes" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/Y19tC')">
-    <div class="channel-logo" style="background-image: url('https://www.skysports.com/core/img/channels/Sky-Sports-Logo-transparent.svg');"></div>
-    <div class="channel-name">Sky Sports La Liga</div>
-</div>
-<div class="channel-item" data-category="Mexico" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/canal5.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/canal5.png');"></div>
-    <div class="channel-name">Canal 5</div>
-</div>
-<div class="channel-item" data-category="Novelas" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/lasestrellas.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/lasestrellas.png');"></div>
-    <div class="channel-name">Las Estrellas</div>
-</div>
-<div class="channel-item" data-category="Argentina" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/telefe.html')">
-    <div class="channel-logo" style="background-image: url('https://www.cablevisionhd.com/imge/telefe.png');"></div>
-    <div class="channel-name">Telecafe</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/americatv.html')">
-    <div class="channel-logo" style="background-image: url('https://www.americatv.com.pe/icons/apple-touch-icon.png');"></div>
-    <div class="channel-name">America TV</div>
-</div>
-<div class="channel-item" data-category="Entretenimiento" onclick="playChannel('iframe', 'https://embed.sdfgnksbounce.com/embed2/latina.html')">
-    <div class="channel-logo" style="background-image: url('https://television-libre.online/img/latinape.webp');"></div>
-    <div class="channel-name">Latina</div>
-</div>
-<div class="channel-item" data-category="Peru" onclick="playChannel('iframe', 'https://unlimplayer.top/embed/GKUsBbSrp4Riwqd')">
-    <div class="channel-logo" style="background-image: url('https://www.caracolatv.cl/wp-content/uploads/2022/11/cropped-LOGO-CARACOLA-05-1-300x169.png');"></div>
-    <div class="channel-name">Caracola TV</div>
-</div>
+                    <!-- Los canales se cargarán dinámicamente -->
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- HLS.js library for HLS streaming support -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <script>
-      	const apiKey = "32e5e53999e380a0291d66fb304153fe"
         const videoPlayer = document.getElementById('video-player');
         const iframePlayer = document.getElementById('iframe-player');
         const spinner = document.getElementById('spinner');
         const errorMessage = document.getElementById('error-message');
+        const apiKey = "32e5e53999e380a0291d66fb304153fe";
+        const startMessage = document.getElementById('start-message');
         const videoContainer = document.getElementById('video-container');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
         const fullscreenMenu = document.getElementById('fullscreen-menu');
         const fullscreenOverlay = document.getElementById('fullscreen-overlay');
         const overlayContent = document.getElementById('overlay-content');
-
+        const licenseDialog = document.getElementById('license-dialog');
+        const reloadButton = document.getElementById('reload-button');
+        const player1Btn = document.getElementById('player1-btn');
+        const player2Btn = document.getElementById('player2-btn');
+        
+        const sidebarSearchBar = document.getElementById('sidebar-search-bar');
+        const overlaySearchBar = document.getElementById('overlay-search-bar');
+        
         let selectedCategoryButton = null;
         let selectedChannelItem = null;
+        let hlsInstance = null;
+        let isLicenseValid = false;
+        let currentChannel = null;
+        let currentVideoUrl = '';
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
 
-        // Sistema de licencia
-        const licenseSystem = {
-        isActivated: true,
-        defaultLicense: "SF-ABC123-TV",
-        licenseKey: "",
-        expectedH1Text: 'StreamFusion',
-        expectedApiKey: '32e5e53999e380a0291d66fb304153fe',
-        titleObserver: null,
-        titleCheckInterval: null,
-        apiKeyCheckInterval: null,
-        originalBodyContent: null,
-        recoveryInterval: null,
+        // Datos de categorías y canales
+        const categories = [
+            { id: "all", name: "Todos" },
+            { id: "Argentina", name: "Argentina" },
+            { id: "Colombia", name: "Colombia" },
+            { id: "España", name: "España" },
+            { id: "Mexico", name: "Mexico" },
+            { id: "Venezuela", name: "Venezuela" },
+            { id: "Cristiano", name: "Cristiano" },
+            { id: "Musica", name: "Música" },
+            { id: "Noticias", name: "Noticias" },
+            { id: "Deportes", name: "Deportes" },
+            { id: "Infantil", name: "Infantil" },
+            { id: "Entretenimiento", name: "Entretenimiento" },
+            { id: "Novelas", name: "Novelas" },
+            { id: "Peliculas", name: "Películas" }
+        ];
 
-      // Inicializar el sistema de licencia
-      init: function () {
-        console.log("Inicializando sistema de licencia...");
-
-        // Obtener el título actual
-        const titleElement = document.querySelector("h1");
-        if (!titleElement) {
-          console.error("No se encontró el elemento licencia");
-          this.showToast("Error crítico: No se encontró el elemento licencia", true);
-          return;
-        }
-
-        const currentH1Text = titleElement.textContent.trim();
-        console.log("licencia actual:", currentH1Text);
-        console.log("licencia esperado:", this.expectedH1Text);
-
-        
-        const h1IsValid = currentH1Text === this.expectedH1Text;
-
-        
-        const currentApiKey = this.getCurrentApiKey();
-        const apiKeyIsValid = !currentApiKey || currentApiKey === this.expectedApiKey;
-
-        
-        if (h1IsValid && apiKeyIsValid) {
-          console.log("licencia y licencia 2 válidos, activando automáticamente");
-
-          
-          const storedLicense = localStorage.getItem("streamfusion_license");
-
-          
-          this.licenseKey = storedLicense || this.defaultLicense;
-
-          
-          if (!storedLicense) {
-            localStorage.setItem("streamfusion_license", this.licenseKey);
-          }
-
-          // Marcar como activado
-          localStorage.setItem("streamfusion_activated", "true");
-          this.isActivated = true;
-
-          // Iniciar monitoreo del licencia y licencia 2
-          this.startTitleMonitoring();
-          this.startApiKeyMonitoring();
-
-          // Mostrar indicador de licencia
-          this.showLicenseStatus(true);
-
-          // Inicializar la aplicación
-          initPage();
-        } else {
-          // Si alguno de los valores no es válido, mostrar mensaje de error y bloquear
-          if (!h1IsValid) {
-            console.log("La licencia no coincide con el esperado");
-            this.showToast("Error: Licencia inválida", true);
-            this.deactivateLicense("Esta licencia ya ha sido usada. Dasactivando código.");
-          } else if (!apiKeyIsValid) {
-            console.log("La licencia no coincide con la esperada");
-            this.showToast("Error: licencia inválida", true);
-            this.deactivateLicense("Esta licencia ya ha sido usada. Dasactivando código");
-          }
-        }
-
-        // Configurar atajo de teclado para generación de licencia (solo para el desarrollador)
-        this.setupKeyboardShortcut();
-      },
-
-      // Iniciar monitoreo de la licencia 2
-      startApiKeyMonitoring: function () {
-        console.log("Iniciando monitoreo de la licencia 2");
-
-        // Detener intervalo existente si hay uno
-        if (this.apiKeyCheckInterval) {
-          clearInterval(this.apiKeyCheckInterval);
-        }
-
-        // Configurar verificación periódica de la licencia 2
-        this.apiKeyCheckInterval = setInterval(() => {
-          // Obtener la API key actual del código
-          const currentApiKey = this.getCurrentApiKey();
-
-          if (currentApiKey && currentApiKey !== this.expectedApiKey) {
-            console.log("licencia invalida. Actual:", currentApiKey, "Esperada:", this.expectedApiKey);
-            clearInterval(this.apiKeyCheckInterval);
-            this.deactivateLicense("Licencia invalidada.");
-          }
-        }, 5000); // Verificar cada 5 segundos
-      },
-
-      // Método auxiliar para obtener la API key actual del código
-      getCurrentApiKey: function () {
-        // Buscar la API key en el código fuente de la página
-        const scripts = document.querySelectorAll('script');
-        let currentApiKey = null;
-
-        for (const script of scripts) {
-          if (script.textContent.includes('const apiKey =')) {
-            // Extraer la API key usando regex
-            const match = script.textContent.match(/const apiKey = ['"]([^'"]+)['"]/);
-            if (match && match[1]) {
-              currentApiKey = match[1];
-              break;
+        const channels = [
+            {
+                id: "caracol-tv",
+                name: "Caracol TV",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Caracol_Televisi%C3%B3n_logo.svg/512px-Caracol_Televisi%C3%B3n_logo.svg.png",
+                type: "hls",
+                source: "https://mdstrm.com/live-stream-playlist/574463697b9817cf0886fc17.m3u8",
+                categories: ["Colombia"]
+            },
+            {
+                id: "caracol-internacional",
+                name: "Caracol Internacional",
+                logo: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Caracol_Internacional_2023.png",
+                type: "iframe",
+                source: "https://embed.sdfgnksbounce.com/embed2/caracol.html",
+                categories: ["Colombia"]
+            },
+            {
+                id: "rcn",
+                name: "RCN",
+                logo: "https://television-libre.net/img/rcn.webp",
+                type: "iframe",
+                source: "https://embed.sdfgnksbounce.com/embed2/rcn.html",
+                categories: ["Colombia"]
+            },
+            {
+                id: "canal-uno",
+                name: "Canal UNO",
+                logo: "https://canal1.com.co/icons/ios/152.png",
+                type: "iframe",
+                source: "https://unlimplayer.top/embed/oy3eFD1QxS9Ga5f",
+                categories: ["Colombia"]
+            },
+            {
+                id: "espn-argentina",
+                name: "ESPN Argentina",
+                logo: "https://television-libre.net//img/espn.webp",
+                type: "iframe",
+                source: "https://embed.sdfgnksbounce.com/embed2/espn.html",
+                categories: ["Deportes", "Argentina"]
+            },
+            {
+                id: "espn-2",
+                name: "ESPN 2",
+                logo: "https://television-libre.net//img/espn2.webp",
+                type: "iframe",
+                source: "https://embed.sdfgnksbounce.com/embed2/espn2.html",
+                categories: ["Deportes"]
             }
-          }
-        }
-
-        return currentApiKey;
-      },
-
-      // Generar una licencia
-      generateLicense: function (customerName) {
-        // Generar parte aleatoria de 6 caracteres
-        const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
-        // Obtener primeras 3 letras del nombre del cliente
-        const namePart = customerName.substring(0, 3).toUpperCase();
-        // Formato: SF-XXXXXX-YYY
-        return `SF-${randomPart}-${namePart}`;
-      },
-
-      // Validar una licencia
-      validateLicense: function (license) {
-        // Validación básica - comprobar formato
-        const licenseRegex = /^SF-[A-Z0-9]{6}-[A-Z]{3}$/;
-        return licenseRegex.test(license);
-      },
-
-      // Iniciar monitoreo del título
-      startTitleMonitoring: function () {
-        const titleElement = document.querySelector("h1");
-        if (!titleElement) {
-          console.error("No se encontró el elemento licencia para monitorear");
-          return;
-        }
-
-        console.log("Iniciando monitoreo de licencia");
-
-        // Desconectar observador existente si hay uno
-        if (this.titleObserver) {
-          this.titleObserver.disconnect();
-        }
-
-        // Detener intervalo existente si hay uno
-        if (this.titleCheckInterval) {
-          clearInterval(this.titleCheckInterval);
-        }
-
-        // Crear un nuevo MutationObserver
-        this.titleObserver = new MutationObserver((mutations) => {
-          const currentH1Text = titleElement.textContent.trim();
-
-          console.log("licencia. Actual:", currentH1Text, "Esperado:", this.expectedH1Text);
-
-          // Si el título ha cambiado, desactivar la licencia
-          if (currentH1Text !== this.expectedH1Text) {
-            console.log("Desactivando licencia");
-            this.deactivateLicense("Esta licencia ya ha sido usada. Dasactivando código");
-          }
-        });
-
-        // Iniciar observación del elemento título
-        this.titleObserver.observe(titleElement, {
-          childList: true,      // Observar cambios en nodos hijos
-          characterData: true,  // Observar cambios en datos de texto
-          subtree: true,        // Observar todos los descendientes
-          attributes: true      // Observar cambios de atributos
-        });
-
-        // Verificación periódica adicional como respaldo
-        this.titleCheckInterval = setInterval(() => {
-          const currentH1Text = titleElement.textContent.trim();
-
-          if (currentH1Text !== this.expectedH1Text) {
-            console.log("Esta licencia ya ha sido usada. Dasactivando código");
-            clearInterval(this.titleCheckInterval);
-            this.deactivateLicense("Esta licencia ya ha sido usada. Dasactivando código");
-          }
-        }, 5000); // Verificar cada 5 segundos
-      },
-
-      // Desactivar temporalmente la licencia
-      deactivateLicense: function (reason) {
-        console.log("Desactivando:", reason);
-
-        // No eliminar la activación de localStorage para permitir recuperación
-        this.isActivated = false;
-
-        // Detener monitoreo temporalmente pero no eliminar los observadores
-        if (this.titleObserver) {
-          this.titleObserver.disconnect();
-        }
-
-        if (this.titleCheckInterval) {
-          clearInterval(this.titleCheckInterval);
-        }
-
-        if (this.apiKeyCheckInterval) {
-          clearInterval(this.apiKeyCheckInterval);
-        }
-
-        // Guardar el contenido original del body si aún no se ha guardado
-        if (!this.originalBodyContent) {
-          this.originalBodyContent = document.body.innerHTML;
-        }
-
-        // Mostrar mensaje de error
-        document.body.innerHTML = '<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; font-family: sans-serif; background-color: #0e0e0e; color: white; height: 100vh;"><h1 style="color: red;">ACCESO DENEGADO</h1><p>Esta licencia ya ha sido usada. Por favor, contacte al proveedor y obtenga un licencia válida.</p><p>Visita: <a href="https://streamfusion.top/" style="color: green;">https://streamfusion.top/</a></p></div>';
-
-        this.showToast(reason, true);
-
-        // Mostrar indicador de licencia inválida
-        this.showLicenseStatus(false);
-
-        // Iniciar verificación periódica para comprobar si los valores han sido restaurados
-        this.startRecoveryCheck();
-      },
-
-      // Añadir una nueva función para verificar periódicamente si los valores han sido restaurados
-      startRecoveryCheck: function () {
-        console.log("Iniciando verificación de recuperación");
-
-        // Detener verificación existente si hay una
-        if (this.recoveryInterval) {
-          clearInterval(this.recoveryInterval);
-        }
-
-        // Iniciar verificación periódica
-        this.recoveryInterval = setInterval(() => {
-          // Verificar si la licencia ha sido restaurado
-          const titleElement = document.querySelector("h1");
-          let h1Restored = false;
-
-          if (titleElement) {
-            const currentH1Text = titleElement.textContent.trim();
-            h1Restored = currentH1Text === this.expectedH1Text;
-            console.log("Verificando licencia:", currentH1Text, "Esperado:", this.expectedH1Text, "Restaurado:", h1Restored);
-          }
-
-          // Verificar si la API key ha sido restaurada
-          const currentApiKey = this.getCurrentApiKey();
-          let apiKeyRestored = false;
-
-          if (currentApiKey) {
-            apiKeyRestored = currentApiKey === this.expectedApiKey;
-            console.log("Verificando licencia 2:", currentApiKey, "Esperada:", this.expectedApiKey, "Restaurada:", apiKeyRestored);
-          }
-
-          // Si ambos valores han sido restaurados, recuperar la aplicación
-          if (h1Restored && (apiKeyRestored || !currentApiKey)) {
-            console.log("Valores restaurados, recuperando aplicación");
-            this.recoverApplication();
-          }
-        }, 3000); // Verificar cada 3 segundos
-      },
-
-      // Añadir una nueva función para recuperar la aplicación
-      recoverApplication: function () {
-        console.log("Recuperando aplicación");
-
-        // Detener verificación de recuperación
-        if (this.recoveryInterval) {
-          clearInterval(this.recoveryInterval);
-          this.recoveryInterval = null;
-        }
-
-        // Restaurar el contenido original del body
-        if (this.originalBodyContent) {
-          document.body.innerHTML = this.originalBodyContent;
-          this.originalBodyContent = null;
-        }
-
-        // Reactivar la licencia
-        this.isActivated = true;
-
-        // Si no hay una licencia almacenada, usar la predeterminada
-        if (!localStorage.getItem("streamfusion_license")) {
-          localStorage.setItem("streamfusion_license", this.defaultLicense);
-          this.licenseKey = this.defaultLicense;
-        } else {
-          this.licenseKey = localStorage.getItem("streamfusion_license");
-        }
-
-        // Asegurarse de que la activación esté marcada como verdadera
-        localStorage.setItem("streamfusion_activated", "true");
-
-        // Reiniciar monitoreo
-        this.startTitleMonitoring();
-        this.startApiKeyMonitoring();
-
-        // Mostrar indicador de licencia válida
-        this.showLicenseStatus(true);
-
-        // Mostrar mensaje de recuperación
-        this.showToast("Aplicación recuperada correctamente");
-
-        // Reinicializar la aplicación directamente sin mostrar el diálogo de activación
-        initPage();
-      },
-
-      // Mostrar diálogo de activación
-      showActivationDialog: function () {
-        const dialog = document.createElement("div");
-        dialog.id = "license-dialog";
-        dialog.className = "license-dialog";
-
-        dialog.innerHTML = `
-            <div class="license-content">
-                <h2 class="license-title">Activar StreamFusion</h2>
-                <p class="license-description">Ingrese su clave de licencia para continuar</p>
-                <div class="license-input-group">
-                    <label for="licenseKey" class="license-label">Clave de Licencia</label>
-                    <input type="text" id="licenseKey" class="license-input" value="" placeholder="SF-XXXX-XXXX">
-                </div>
-                <div class="license-button-group">
-                    <button id="activateButton" class="license-button">Activar</button>
-                </div>
-                <p id="license-message" class="license-message"></p>
-            </div>
-        `;
-
-        document.body.appendChild(dialog);
-
-        const licenseInput = document.getElementById("licenseKey");
-        const activateButton = document.getElementById("activateButton");
-        const licenseMessage = document.getElementById("license-message");
-
-        // Si hay una licencia predeterminada, mostrarla en el campo
-        if (this.defaultLicense) {
-          licenseInput.value = this.defaultLicense;
-        }
-
-        // Configurar evento de clic para el botón de activación
-        activateButton.onclick = () => {
-          const license = licenseInput.value.trim();
-
-          if (!license) {
-            licenseMessage.textContent = "Por favor ingresa una licencia válida";
-            licenseMessage.style.display = "block";
-            return;
-          }
-
-          if (this.validateLicense(license)) {
-            this.activateLicense(license);
-            dialog.style.display = "none";
-          } else {
-            licenseMessage.textContent = "Licencia inválida. Por favor verifica e intenta nuevamente.";
-            licenseMessage.style.display = "block";
-          }
-        };
-      },
-
-      // Mostrar diálogo de generación de licencia
-      showGeneratorDialog: function () {
-        // Crear elementos del diálogo
-        const dialog = document.createElement("div");
-        dialog.className = "license-dialog";
-        dialog.id = "generatorDialog";
-
-        dialog.innerHTML = `
-            <div class="license-content">
-                <h2 class="license-title">Generador de Licencia</h2>
-                <p class="license-description">Genera una clave de licencia para tu cliente</p>
-                <div class="license-input-group">
-                    <label for="customerName" class="license-label">Nombre del Cliente</label>
-                    <input type="text" id="customerName" class="license-input" placeholder="Ingresa el nombre del cliente">
-                </div>
-                <div id="licenseResult" style="margin-top: 15px; display: none;">
-                    <label for="generatedLicense" class="license-label">Licencia Generada</label>
-                    <input type="text" id="generatedLicense" class="license-input" readonly>
-                    <button id="copyButton" style="background-color: #333; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; margin-top: 10px;">Copiar</button>
-                </div>
-                <div style="margin-top: 20px; display: flex; justify-content: space-between;">
-                    <button id="closeButton" style="background-color: #333; color: white; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer;">Cerrar</button>
-                    <button id="generateButton" style="background-color: #e50914; color: white; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer;">Generar Licencia</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(dialog);
-
-        // Configurar eventos
-        document.getElementById("generateButton").addEventListener("click", () => {
-          const customerName = document.getElementById("customerName").value.trim();
-          if (!customerName) {
-            this.showToast("Por favor ingresa el nombre del cliente", true);
-            return;
-          }
-
-          const license = this.generateLicense(customerName);
-          document.getElementById("generatedLicense").value = license;
-          document.getElementById("licenseResult").style.display = "block";
-        });
-
-        document.getElementById("copyButton").addEventListener("click", () => {
-          const licenseInput = document.getElementById("generatedLicense");
-          licenseInput.select();
-          document.execCommand("copy");
-          this.showToast("Licencia copiada al portapapeles");
-        });
-
-        document.getElementById("closeButton").addEventListener("click", () => {
-          document.body.removeChild(dialog);
-        });
-      },
-
-      // Activar una licencia
-      activateLicense: function (licenseKey) {
-        const titleElement = document.querySelector("h1");
-        if (!titleElement) {
-          this.showToast("No se pudo encontrar el elemento de título", true);
-          return;
-        }
-
-        const currentH1Text = titleElement.textContent.trim();
-
-        console.log("Activando licencia. Clave:", licenseKey, "H1 actual:", currentH1Text);
-
-        // Verificar que el H1 coincida con el esperado
-        if (currentH1Text !== this.expectedH1Text) {
-          console.log("El H1 no coincide con el esperado, no se puede activar la licencia");
-          this.showToast("Licencia incorrecta. No se puede activar el código.", true);
-          return;
-        }
-
-        // Verificar que la API key coincida con la esperada
-        const currentApiKey = this.getCurrentApiKey();
-        if (currentApiKey && currentApiKey !== this.expectedApiKey) {
-          console.log("La API key no coincide con la esperada, no se puede activar la licencia");
-          this.showToast("La licencia ya esta en uso. No se puede activar la licencia.", true);
-          return;
-        }
-
-        const isLicenseValid = this.validateLicense(licenseKey);
-
-        if (isLicenseValid) {
-          console.log("Licencia válida, activando...");
-          this.isActivated = true;
-          this.licenseKey = licenseKey;
-
-          // Guardar en localStorage
-          localStorage.setItem("streamfusion_license", licenseKey);
-          localStorage.setItem("streamfusion_activated", "true");
-
-          // Iniciar monitoreo del título y API key
-          this.startTitleMonitoring();
-          this.startApiKeyMonitoring();
-
-          this.showToast("Licencia activada correctamente");
-
-          // Mostrar indicador de licencia
-          this.showLicenseStatus(true);
-
-          // Inicializar la aplicación
-          initPage();
-        } else {
-          console.log("Licencia inválida");
-          this.showToast("La clave de licencia es inválida", true);
-        }
-      },
-
-      // Mostrar estado de licencia
-      showLicenseStatus: function (isValid) {
-        // Eliminar indicador existente si lo hay
-        const existingStatus = document.getElementById("licenseStatus");
-        if (existingStatus) {
-          document.body.removeChild(existingStatus);
-        }
-
-        // Crear nuevo indicador
-        const status = document.createElement("div");
-        status.id = "licenseStatus";
-        status.className = isValid ? "license-status license-valid" : "license-status license-invalid";
-        status.textContent = isValid ? "Licenciado" : "Sin Licencia";
-
-        document.body.appendChild(status);
-      },
-
-      // Mostrar mensaje toast
-      showToast: function (message, isError = false) {
-        console.log("Toast:", message, isError ? "(Error)" : "");
-
-        // Eliminar toast existente si lo hay
-        const existingToast = document.getElementById("licenseToast");
-        if (existingToast) {
-          document.body.removeChild(existingToast);
-        }
-
-        // Crear nuevo toast
-        const toast = document.createElement("div");
-        toast.id = "licenseToast";
-        toast.className = `license-toast ${isError ? 'license-toast-error' : 'license-toast-success'}`;
-        toast.textContent = message;
-        toast.style.opacity = "0";
-
-        document.body.appendChild(toast);
-
-        // Mostrar y ocultar con animación
-        setTimeout(() => {
-          toast.style.opacity = "1";
-
-          setTimeout(() => {
-            toast.style.opacity = "0";
-
-            setTimeout(() => {
-              if (document.body.contains(toast)) {
-                document.body.removeChild(toast);
-              }
-            }, 300);
-          }, 3000);
-        }, 10);
-      },
-
-      // Configurar atajo de teclado para generación de licencia
-      setupKeyboardShortcut: function () {
-        let keyBuffer = "";
-
-        window.addEventListener("keydown", (e) => {
-          if (e.target instanceof HTMLInputElement) return;
-
-          // Rastrear las últimas 10 teclas presionadas
-          keyBuffer = (keyBuffer + e.key).slice(-10);
-
-          // Comprobar si se escribió "genlicense"
-          if (keyBuffer === "genlicense") {
-            console.log("Atajo de teclado detectado: genlicense");
-            this.showGeneratorDialog();
-            keyBuffer = "";
-          }
-        });
-      }
-    };
-
-        // Función para cambiar entre reproductores
+        ];
+
+        // Sistema de licencia avanzado
+        const StreamFusionLicense = (() => {
+            // MÓDULO DE CONFIGURACIÓN
+            const Config = (() => { 
+                // Función para codificar en Base64
+                const encode = (str) => btoa(unescape(encodeURIComponent(str)));
+                // Función para decodificar en Base64
+                const decode = (str) => decodeURIComponent(escape(atob(str)));
+
+                // Configuración privada con datos encriptados
+                const _settings = {
+                    isActivated: false,
+                    defaultLicense: "SF-ABC123-TV",
+                    licenseKey: "",
+                    encryptedExpectedH1Text: "U3RyZWFtRnVzaW9u",
+                    encryptedExpectedApiKey: "MzJlNWU1Mzk5OWUzODBhMDI5MWQ2NmZiMzA0MTUzZmU=",
+                };
+
+                // Almacenamiento local
+                const _storage = {
+                    saveLicense: (license) => localStorage.setItem("streamfusion_license", license),
+                    getLicense: () => localStorage.getItem("streamfusion_license"),
+                    setActivated: (value) => localStorage.setItem("streamfusion_activated", value ? "true" : "false"),
+                    isActivated: () => localStorage.getItem("streamfusion_activated") === "true",
+                    clearLicense: () => {
+                        localStorage.removeItem("streamfusion_license");
+                        localStorage.removeItem("streamfusion_activated");
+                    }
+                };
+
+                // API público
+                return {
+                    getSettings: () => ({
+                        ..._settings,
+                        expectedH1Text: decode(_settings.encryptedExpectedH1Text),
+                        expectedApiKey: decode(_settings.encryptedExpectedApiKey),
+                    }),
+
+                    setActivated: (value) => {
+                        _settings.isActivated = value;
+                    },
+
+                    setLicenseKey: (value) => {
+                        _settings.licenseKey = value;
+                    },
+
+                    storage: {
+                        saveLicense: _storage.saveLicense,
+                        getLicense: _storage.getLicense,
+                        setActivated: _storage.setActivated,
+                        isActivated: _storage.isActivated,
+                        clearLicense: _storage.clearLicense
+                    }
+                };
+            })();
+                
+            // MÓDULO DE VALIDACIÓN
+            const Validator = (() => {
+                // Submódulo de detección
+                const _detector = {
+                    // Obtener la API key actual del código
+                    getCurrentApiKey: () => {
+                        const scripts = document.querySelectorAll("script");
+                        let currentApiKey = null;
+
+                        for (const script of scripts) {
+                            const content = script.textContent || "";
+                            if (content.includes("const apiKey =")) {
+                                const match = content.match(/const apiKey = ["']([^"']+)["']/);
+                                if (match && match[1]) {
+                                    currentApiKey = match[1];
+                                    break;
+                                }
+                            }
+                        }
+
+                        return currentApiKey;
+                    },
+                    
+                    // Obtener el texto del título actual
+                    getCurrentH1Text: () => {
+                        const titleElement = document.querySelector("h1");
+                        return titleElement ? titleElement.textContent.trim() : null;
+                    }
+                };
+                
+                // Submódulo de verificación
+                const _verifier = {
+                    // Validar formato de licencia
+                    validateLicenseFormat: (license) => {
+                        const licenseRegex = /^SF-[A-Z0-9]{6}-[A-Z]{3}$/;
+                        return licenseRegex.test(license);
+                    },
+                    
+                    // Verificar título
+                    verifyH1Text: () => {
+                        const currentH1Text = _detector.getCurrentH1Text();
+                        const expectedH1Text = Config.getSettings().expectedH1Text;
+                        
+                        if (!currentH1Text) {
+                            return { valid: false, reason: "No se encontró el elemento h1" };
+                        }
+                        
+                        return { 
+                            valid: currentH1Text === expectedH1Text,
+                            reason: currentH1Text !== expectedH1Text ? "Esta licencia ya ha sido usada. Código desactivado" : null
+                        };
+                    },
+                    
+                    // Verificar API key
+                    verifyApiKey: () => {
+                        const currentApiKey = _detector.getCurrentApiKey();
+                        const expectedApiKey = Config.getSettings().expectedApiKey;
+                        
+                        if (!currentApiKey) {
+                            return { valid: false, reason: "No se encontró la API key" };
+                        }
+                        
+                        return { 
+                            valid: currentApiKey === expectedApiKey,
+                            reason: currentApiKey !== expectedApiKey ? "Esta licencia ya ha sido usada. Código desactivado" : null
+                        };
+                    }
+                };
+                
+                // Submódulo de generación
+                const _generator = {
+                    // Generar una licencia
+                    generateLicense: (customerName) => {
+                        const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+                        const namePart = customerName.substring(0, 3).toUpperCase();
+                        return `SF-${randomPart}-${namePart}`;
+                    }
+                };
+                
+                // API público
+                return {
+                    // Funciones de detección
+                    detector: {
+                        getCurrentApiKey: _detector.getCurrentApiKey,
+                        getCurrentH1Text: _detector.getCurrentH1Text
+                    },
+                    
+                    // Funciones de verificación
+                    verifier: {
+                        validateLicenseFormat: _verifier.validateLicenseFormat,
+                        verifyH1Text: _verifier.verifyH1Text,
+                        verifyApiKey: _verifier.verifyApiKey,
+                        
+                        // Verificación completa
+                        verifyLicense: () => {
+                            const h1Result = _verifier.verifyH1Text();
+                            if (!h1Result.valid) {
+                                return h1Result;
+                            }
+                            
+                            const apiKeyResult = _verifier.verifyApiKey();
+                            if (!apiKeyResult.valid) {
+                                return apiKeyResult;
+                            }
+                            
+                            return { valid: true };
+                        }
+                    },
+                    
+                    // Funciones de generación
+                    generator: {
+                        generateLicense: _generator.generateLicense
+                    }
+                }
+            })()
+            
+            // MÓDULO DE MONITOREO
+            const Monitor = (() => {
+                // Variables privadas
+                let _titleObserver = null
+                let _titleCheckInterval = null
+                let _apiKeyCheckInterval = null
+                
+                // Submódulo de monitoreo de título
+                const _titleMonitor = {
+                    // Iniciar monitoreo del título
+                    start: () => {
+                        const titleElement = document.querySelector("h1")
+                        if (!titleElement) {
+                            console.error("No se encontró el elemento h1 para monitorear")
+                            return
+                        }
+
+                        console.log("Iniciando monitoreo de licencia")
+
+                        if (_titleObserver) {
+                            _titleObserver.disconnect()
+                        }
+
+                        if (_titleCheckInterval) {
+                            clearInterval(_titleCheckInterval)
+                        }
+
+                        _titleObserver = new MutationObserver(() => {
+                            const h1Result = Validator.verifier.verifyH1Text()
+                            
+                            if (!h1Result.valid) {
+                                console.log("Licencia invalida. Desactivado código.")
+                                StreamFusionLicense.Recovery.deactivate("Licencia invalida. Desactivado código.")
+                            }
+                        })
+
+                        _titleObserver.observe(titleElement, {
+                            childList: true,
+                            characterData: true,
+                            subtree: true,
+                            attributes: true,
+                        })
+
+                        // Verificación periódica adicional
+                        _titleCheckInterval = setInterval(() => {
+                            const h1Result = Validator.verifier.verifyH1Text()
+                            
+                            if (!h1Result.valid) {
+                                console.log("Licencia invalida por verificación periódica")
+                                clearInterval(_titleCheckInterval)
+                                StreamFusionLicense.Recovery.deactivate("Licencia invalidada.")
+                            }
+                        }, 5000)
+                    },
+                    
+                    // Detener monitoreo del título
+                    stop: () => {
+                        if (_titleObserver) {
+                            _titleObserver.disconnect()
+                        }
+
+                        if (_titleCheckInterval) {
+                            clearInterval(_titleCheckInterval)
+                        }
+                    }
+                }
+                
+                // Submódulo de monitoreo de API key
+                const _apiKeyMonitor = {
+                    // Iniciar monitoreo de API key
+                    start: () => {
+                        console.log("Iniciando monitoreo de la licencia")
+
+                        if (_apiKeyCheckInterval) {
+                            clearInterval(_apiKeyCheckInterval)
+                        }
+
+                        _apiKeyCheckInterval = setInterval(() => {
+                            const apiKeyResult = Validator.verifier.verifyApiKey()
+                            
+                            if (!apiKeyResult.valid) {
+                                console.log("La licencia 2 ha sido modificada.")
+                                clearInterval(_apiKeyCheckInterval)
+                                StreamFusionLicense.Recovery.deactivate("Esta licencia ya ha sido usada. Licencia invalidada.")
+                            }
+                        }, 5000)
+                    },
+                    
+                    // Detener monitoreo de API key
+                    stop: () => {
+                        if (_apiKeyCheckInterval) {
+                            clearInterval(_apiKeyCheckInterval)
+                        }
+                    }
+                }
+                
+                // API público
+                return {
+                    // Iniciar todo el monitoreo
+                    startAll: () => {
+                        _titleMonitor.start()
+                        _apiKeyMonitor.start()
+                    },
+                    
+                    // Detener todo el monitoreo
+                    stopAll: () => {
+                        _titleMonitor.stop()
+                        _apiKeyMonitor.stop()
+                    },
+                    
+                    // Acceso a monitores individuales
+                    title: {
+                        start: _titleMonitor.start,
+                        stop: _titleMonitor.stop
+                    },
+                    
+                    apiKey: {
+                        start: _apiKeyMonitor.start,
+                        stop: _apiKeyMonitor.stop
+                    }
+                }
+            })()
+            
+            // MÓDULO DE INTERFAZ DE USUARIO
+            const UI = (() => {
+                // Submódulo de diálogos
+                const _dialogs = {
+                    // Mostrar diálogo de activación
+                    showActivationDialog: () => {
+                        const dialog = document.getElementById("license-dialog")
+                        const licenseInput = document.getElementById("licenseKey")
+                        const activateButton = document.getElementById("activateButton")
+                        const licenseMessage = document.getElementById("license-message")
+
+                        dialog.style.display = "flex"
+
+                        const config = Config.getSettings()
+                        if (config.defaultLicense) {
+                            licenseInput.value = config.defaultLicense
+                        }
+
+                        activateButton.onclick = () => {
+                            const license = licenseInput.value.trim()
+
+                            if (!license) {
+                                licenseMessage.textContent = "Por favor ingresa una licencia válida"
+                                licenseMessage.style.display = "block"
+                                return
+                            }
+
+                            if (Validator.verifier.validateLicenseFormat(license)) {
+                                StreamFusionLicense.Manager.activateLicense(license)
+                                dialog.style.display = "none"
+                            } else {
+                                licenseMessage.textContent = "Licencia inválida. Por favor verifica e intenta nuevamente."
+                                licenseMessage.style.display = "block"
+                            }
+                        }
+                    },
+                    
+                    // Mostrar diálogo de generación de licencia
+                    showGeneratorDialog: () => {
+                        const dialog = document.createElement("div")
+                        dialog.className = "license-dialog"
+                        dialog.id = "generatorDialog"
+
+                        dialog.innerHTML = `
+                            <div class="license-content">
+                                <h2 class="license-title">Generador de Licencia</h2>
+                                <p class="license-description">Genera una clave de licencia para tu cliente</p>
+                                <div class="license-input-group">
+                                    <label for="customerName" class="license-label">Nombre del Cliente</label>
+                                    <input type="text" id="customerName" class="license-input" placeholder="Ingresa el nombre del cliente">
+                                </div>
+                                <div id="licenseResult" style="margin-top: 15px; display: none;">
+                                    <label for="generatedLicense" class="license-label">Licencia Generada</label>
+                                    <input type="text" id="generatedLicense" class="license-input" readonly>
+                                    <button id="copyButton" style="background-color: #333; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; margin-top: 10px;">Copiar</button>
+                                </div>
+                                <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                                    <button id="closeButton" style="background-color: #333; color: white; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer;">Cerrar</button>
+                                    <button id="generateButton" style="background-color: #e50914; color: white; border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer;">Generar Licencia</button>
+                                </div>
+                            </div>
+                        `
+
+                        document.body.appendChild(dialog)
+
+                        document.getElementById("generateButton").addEventListener("click", () => {
+                            const customerName = document.getElementById("customerName").value.trim()
+                            if (!customerName) {
+                                _notifications.showToast("Por favor ingresa el nombre del cliente", true)
+                                return
+                            }
+
+                            const license = Validator.generator.generateLicense(customerName)
+                            document.getElementById("generatedLicense").value = license
+                            document.getElementById("licenseResult").style.display = "block"
+                        })
+
+                        document.getElementById("copyButton").addEventListener("click", () => {
+                            const licenseInput = document.getElementById("generatedLicense")
+                            licenseInput.select()
+                            document.execCommand("copy")
+                            _notifications.showToast("Licencia copiada al portapapeles")
+                        })
+
+                        document.getElementById("closeButton").addEventListener("click", () => {
+                            document.body.removeChild(dialog)
+                        })
+                    }
+                }
+                
+                // Submódulo de notificaciones
+                const _notifications = {
+                    // Mostrar estado de licencia
+                    showLicenseStatus: (isValid) => {
+                        const existingStatus = document.getElementById("licenseStatus")
+                        if (existingStatus) {
+                            document.body.removeChild(existingStatus)
+                        }
+
+                        const status = document.createElement("div")
+                        status.id = "licenseStatus"
+                        status.className = isValid ? "license-status license-valid" : "license-status license-invalid"
+                        status.textContent = isValid ? "Licenciado" : "Sin Licencia"
+
+                        document.body.appendChild(status)
+                    },
+                    
+                    // Mostrar mensaje toast
+                    showToast: (message, isError = false) => {
+                        console.log("Toast:", message, isError ? "(Error)" : "")
+
+                        const existingToast = document.getElementById("licenseToast")
+                        if (existingToast) {
+                            document.body.removeChild(existingToast)
+                        }
+
+                        const toast = document.createElement("div")
+                        toast.id = "licenseToast"
+                        toast.className = `license-toast ${isError ? "license-toast-error" : "license-toast-success"}`
+                        toast.textContent = message
+                        toast.style.opacity = "0"
+
+                        document.body.appendChild(toast)
+
+                        setTimeout(() => {
+                            toast.style.opacity = "1"
+
+                            setTimeout(() => {
+                                toast.style.opacity = "0"
+
+                                setTimeout(() => {
+                                    if (document.body.contains(toast)) {
+                                        document.body.removeChild(toast)
+                                    }
+                                }, 300)
+                            }, 3000)
+                        }, 10)
+                    }
+                }
+                
+                // Submódulo de atajos de teclado
+                const _shortcuts = {
+                    // Configurar atajo de teclado para generación de licencia
+                    setupKeyboardShortcut: () => {
+                        let keyBuffer = ""
+
+                        window.addEventListener("keydown", (e) => {
+                            if (e.target instanceof HTMLInputElement) return
+
+                            keyBuffer = (keyBuffer + e.key).slice(-10)
+
+                            if (keyBuffer === "genlicense") {
+                                console.log("Atajo de teclado detectado: genlicense")
+                                _dialogs.showGeneratorDialog()
+                                keyBuffer = ""
+                            }
+                        })
+                    }
+                }
+                
+                // API público
+                return {
+                    // Inicializar UI
+                    init: () => {
+                        // Los estilos ya están en el HTML
+                        _shortcuts.setupKeyboardShortcut()
+                    },
+                    
+                    // Diálogos
+                    dialogs: {
+                        showActivation: _dialogs.showActivationDialog,
+                        showGenerator: _dialogs.showGeneratorDialog
+                    },
+                    
+                    // Notificaciones
+                    notifications: {
+                        showStatus: _notifications.showLicenseStatus,
+                        showToast: _notifications.showToast
+                    },
+                    
+                    // Atajos
+                    shortcuts: {
+                        setup: _shortcuts.setupKeyboardShortcut
+                    }
+                }
+            })()
+            
+            // MÓDULO DE RECUPERACIÓN
+            const Recovery = (() => {
+                // Variables privadas
+                let _originalBodyContent = null
+                let _recoveryInterval = null
+                
+                // Submódulo de desactivación
+                const _deactivator = {
+                    // Desactivar licencia
+                    deactivate: (reason) => {
+                        console.log("Desactivado", reason)
+
+                        // Actualizar estado
+                        Config.setActivated(false)
+
+                        // Detener monitoreo
+                        Monitor.stopAll()
+
+                        // Guardar el contenido original del body
+                        if (!_originalBodyContent) {
+                            _originalBodyContent = document.body.innerHTML
+                        }
+
+                        // Mostrar mensaje de error
+                        document.body.innerHTML =
+                            '<div style="display: flex; justify-content: center; flex-direction: column; text-align: center; font-family: sans-serif; background-color: #0e0e0e; color: white; height: 100vh;"><h2 style="font-size: 28px; color: red;">ACCESO DENEGADO</h2><p>Esta licencia ya ha sido usada. Por favor, contacte al proveedor y obtenga una licencia válida.</p><p>Visita: <a href="https://streamfusion.top/" style="color: green;">https://streamfusion.top/</a></p></div>'
+
+                        UI.notifications.showToast(reason, true)
+                        UI.notifications.showStatus(false)
+
+                        // Iniciar verificación de recuperación
+                        _recoveryChecker.startCheck()
+                    }
+                }
+                
+                // Submódulo de verificación de recuperación
+                const _recoveryChecker = {
+                    // Iniciar verificación de recuperación
+                    startCheck: () => {
+                        console.log("Iniciando verificación de recuperación")
+
+                        if (_recoveryInterval) {
+                            clearInterval(_recoveryInterval)
+                        }
+
+                        _recoveryInterval = setInterval(() => {
+                            // Verificar si el h1 ha sido restaurado
+                            const h1Result = Validator.verifier.verifyH1Text()
+                            
+                            // Verificar si la API key ha sido restaurada
+                            const apiKeyResult = Validator.verifier.verifyApiKey()
+                            
+                            // Si ambos valores han sido restaurados, recuperar la aplicación
+                            if (h1Result.valid && apiKeyResult.valid) {
+                                console.log("Valores restaurados, recuperando aplicación")
+                                _recoverer.recover()
+                            }
+                        }, 3000)
+                    },
+                    
+                    // Detener verificación de recuperación
+                    stopCheck: () => {
+                        if (_recoveryInterval) {
+                            clearInterval(_recoveryInterval)
+                            _recoveryInterval = null
+                        }
+                    }
+                }
+                
+                // Submódulo de recuperación
+                const _recoverer = {
+                    // Recuperar aplicación
+                    recover: () => {
+                        console.log("Recuperando aplicación")
+
+                        // Detener verificación de recuperación
+                        _recoveryChecker.stopCheck()
+
+                        // Restaurar el contenido original del body
+                        if (_originalBodyContent) {
+                            document.body.innerHTML = _originalBodyContent
+                            _originalBodyContent = null
+                        }
+
+                        // Reactivar licencia
+                        Config.setActivated(true)
+
+                        const settings = Config.getSettings()
+
+                        // Si no hay una licencia almacenada, usar la predeterminada
+                        if (!Config.storage.getLicense()) {
+                            Config.storage.saveLicense(settings.defaultLicense)
+                            Config.setLicenseKey(settings.defaultLicense)
+                        } else {
+                            Config.setLicenseKey(Config.storage.getLicense())
+                        }
+
+                        // Marcar como activado
+                        Config.storage.setActivated(true)
+
+                        // Reiniciar monitoreo
+                        Monitor.startAll()
+
+                        // Actualizar UI
+                        UI.notifications.showStatus(true)
+                        UI.notifications.showToast("Aplicación recuperada correctamente")
+
+                        // Reinicializar la aplicación
+                        initializeApp()
+                    }
+                }
+                
+                // API público
+                return {
+                    // Desactivar licencia
+                    deactivate: _deactivator.deactivate,
+                    
+                    // Verificación de recuperación
+                    checker: {
+                        start: _recoveryChecker.startCheck,
+                        stop: _recoveryChecker.stopCheck
+                    },
+                    
+                    // Recuperación
+                    recover: _recoverer.recover
+                }
+            })()
+            
+            // MÓDULO DE GESTIÓN
+            const Manager = (() => {
+                // Submódulo de inicialización
+                const _initializer = {
+                    // Inicializar el sistema de licencias
+                    init: () => {
+                        console.log("Inicializando sistema de licencia...")
+
+                        // Inicializar UI
+                        UI.init()
+
+                        // Verificar licencia actual
+                        const verificationResult = Validator.verifier.verifyLicense()
+
+                        if (verificationResult.valid) {
+                            console.log("Licencia y Licencia 2 válidos, activando automáticamente")
+
+                            // Comprobar si ya hay una licencia almacenada
+                            const storedLicense = Config.storage.getLicense()
+                            const settings = Config.getSettings()
+
+                            // Usar la licencia almacenada o la predeterminada
+                            const licenseKey = storedLicense || settings.defaultLicense
+                            Config.setLicenseKey(licenseKey)
+
+                            // Guardar en localStorage si no existe
+                            if (!storedLicense) {
+                                Config.storage.saveLicense(licenseKey)
+                            }
+
+                            // Marcar como activado
+                            Config.storage.setActivated(true)
+                            Config.setActivated(true)
+
+                            // Iniciar monitoreo
+                            Monitor.startAll()
+
+                            // Mostrar indicador de licencia
+                            UI.notifications.showStatus(true)
+                            
+                            // Actualizar variable global
+                            isLicenseValid = true;
+
+                            // Inicializar la aplicación
+                            initializeApp()
+                        } else {
+                            console.log("Verificación fallida:", verificationResult.reason)
+                            UI.notifications.showToast("Error: Licencia inválida", true)
+                            UI.dialogs.showActivation()
+                        }
+                    }
+                }
+                
+                // Submódulo de activación
+                const _activator = {
+                    // Activar una licencia
+                    activateLicense: (licenseKey) => {
+                        const verificationResult = Validator.verifier.verifyLicense()
+
+                        if (!verificationResult.valid) {
+                            UI.notifications.showToast(verificationResult.reason, true)
+                            return
+                        }
+
+                        const isLicenseValid = Validator.verifier.validateLicenseFormat(licenseKey)
+
+                        if (isLicenseValid) {
+                            console.log("Licencia válida, activando...")
+                            Config.setActivated(true)
+                            Config.setLicenseKey(licenseKey)
+
+                            // Guardar en localStorage
+                            Config.storage.saveLicense(licenseKey)
+                            Config.storage.setActivated(true)
+
+                            // Iniciar monitoreo
+                            Monitor.startAll()
+
+                            UI.notifications.showToast("Licencia activada correctamente")
+                            UI.notifications.showStatus(true)
+                            
+                            // Actualizar variable global
+                            window.isLicenseValid = true;
+
+                            // Inicializar la aplicación
+                            initializeApp()
+                        } else {
+                            console.log("Licencia inválida")
+                            UI.notifications.showToast("La clave de licencia es inválida", true)
+                        }
+                    }
+                }
+                
+                // API público
+                return {
+                    // Inicializar
+                    init: _initializer.init,
+                    
+                    // Activar licencia
+                    activateLicense: _activator.activateLicense
+                }
+            })()
+            
+            // INICIALIZACIÓN Y API PÚBLICA
+            const publicAPI = {
+                // Módulos internos (para uso interno)
+                Config: Config,
+                Validator: Validator,
+                Monitor: Monitor,
+                UI: UI,
+                Recovery: Recovery,
+                Manager: Manager,
+
+                // API pública para uso externo
+                init: () => {
+                    Manager.init()
+                },
+                
+                activateLicense: (licenseKey) => {
+                    Manager.activateLicense(licenseKey)
+                },
+                
+                generateLicense: (customerName) => {
+                    return Validator.generator.generateLicense(customerName)
+                },
+                
+                validateLicense: (license) => {
+                    return Validator.verifier.validateLicenseFormat(license)
+                },
+                
+                showActivationDialog: () => {
+                    UI.dialogs.showActivation()
+                },
+                
+                showGeneratorDialog: () => {
+                    UI.dialogs.showGenerator()
+                },
+                
+                showToast: (message, isError) => {
+                    UI.notifications.showToast(message, isError)
+                }
+            }
+
+            return publicAPI
+        })();
+
+        // Funciones para el reproductor
         function switchPlayer(type) {
-            // Verificar si la licencia está activada
-            if (!licenseSystem.isActivated) {
-                errorMessage.textContent = "Licencia no activada. Por favor active el software.";
-                errorMessage.style.display = "block";
-                return;
-            }
-
             const players = document.querySelectorAll('.player');
             players.forEach(player => player.classList.remove('active'));
+
+            startMessage.style.display = 'none';
+            reloadButton.style.display = 'block';
 
             if (type === 'iframe') {
                 iframePlayer.classList.add('active');
@@ -2161,82 +1631,82 @@
             }
         }
 
-        // Función para detener el reproductor activo
         function stopActivePlayer() {
             // Detener el reproductor de video
-            if (!videoPlayer.paused) {
+            if (videoPlayer && !videoPlayer.paused) {
                 videoPlayer.pause();
-                videoPlayer.src = ''; // Limpiar la fuente
+                videoPlayer.src = '';
+                videoPlayer.load();
             }
 
             // Limpiar el reproductor de iframe
-            iframePlayer.src = '';
+            if (iframePlayer) {
+                iframePlayer.src = '';
+            }
 
-            // Limpiar el reproductor DASH si está inicializado
-            if (window.dashPlayer) {
-                window.dashPlayer.reset();
-                window.dashPlayer = null;
+            // Limpiar el reproductor HLS si está inicializado
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
             }
 
             // Ocultar el mensaje de error
             errorMessage.style.display = 'none';
+            reloadButton.style.display = 'none';
         }
 
-        // Función para mostrar el spinner
         function showSpinner() {
             spinner.style.display = 'block';
-            errorMessage.style.display = 'none'; // Asegurarse de ocultar el mensaje de error
+            errorMessage.style.display = 'none';
+            startMessage.style.display = 'none';
         }
 
-        // Función para ocultar el spinner
         function hideSpinner() {
             spinner.style.display = 'none';
         }
 
-        // Función para mostrar el mensaje de error
         function showError() {
             errorMessage.style.display = 'block';
-            spinner.style.display = 'none'; // Ocultar spinner
+            spinner.style.display = 'none';
+            startMessage.style.display = 'none';
         }
 
-        // Función para reproducir un canal
-        function playChannel(type, source) {
-            // Verificar si la licencia está activada
-            if (!licenseSystem.isActivated) {
-                errorMessage.textContent = "Licencia no activada. Por favor active el software.";
-                errorMessage.style.display = "block";
-                return;
-            }
-
+        function playChannel(channel) {
             // Mostrar el spinner mientras se carga el canal
             showSpinner();
 
             // Detener el reproductor activo antes de cambiar
             stopActivePlayer();
 
-            // Cambiar al reproductor adecuado
-            switchPlayer(type);
+            // Guardar el canal actual
+            currentChannel = channel;
+            currentVideoUrl = channel.source;
 
-            if (type === 'hls') {
+            // Cambiar al reproductor adecuado
+            switchPlayer(channel.type);
+
+            if (channel.type === 'hls') {
                 // HLS stream
                 if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(source);
-                    hls.attachMedia(videoPlayer);
+                    hlsInstance = new Hls();
+                    hlsInstance.loadSource(channel.source);
+                    hlsInstance.attachMedia(videoPlayer);
 
                     // Manejar errores de HLS
-                    hls.on(Hls.Events.ERROR, function (event, data) {
+                    hlsInstance.on(Hls.Events.ERROR, function (event, data) {
                         if (data.fatal) {
                             console.error('Error fatal en HLS:', data);
                             showError();
                         }
                     });
 
-                    videoPlayer.play().catch(() => {
-                        showError();
+                    hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                        videoPlayer.play().catch(() => {
+                            showError();
+                        });
                     });
                 } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
-                    videoPlayer.src = source;
+                    videoPlayer.src = channel.source;
                     videoPlayer.play().catch(() => {
                         showError();
                     });
@@ -2244,70 +1714,23 @@
                     showError();
                 }
 
-                // Ocultar controles del reproductor
-                videoPlayer.removeAttribute('controls'); // Eliminar controles
-                videoPlayer.classList.add('no-controls'); // Clase para estilos adicionales
-
                 // Ocultar el mensaje de error cuando el video empiece a reproducirse
                 videoPlayer.onplaying = function () {
                     hideSpinner();
-                    errorMessage.style.display = 'none'; // Asegurarse de ocultar el mensaje de error
+                    errorMessage.style.display = 'none';
                 };
-            } else if (type === 'dash') {
-                // DASH stream
-                if (!window.dashPlayer) {
-                    window.dashPlayer = dashjs.MediaPlayer().create();
-                }
-                window.dashPlayer.initialize(videoPlayer, source, true); // Inicializar DASH
-
-                // Manejar errores de DASH
-                window.dashPlayer.on('error', function () {
-                    console.error('Error en DASH');
-                    showError();
-                });
-
-                videoPlayer.play().catch(() => {
-                    showError();
-                });
-
-                // Ocultar el mensaje de error cuando el video empiece a reproducirse
-                videoPlayer.onplaying = function () {
-                    hideSpinner();
-                    errorMessage.style.display = 'none'; // Asegurarse de ocultar el mensaje de error
-                };
-            } else if (type === 'iframe') {
+            } else if (channel.type === 'iframe') {
                 // Iframe embed
-                iframePlayer.src = source;
-
-                // Remover estilo específico para HLS si es necesario
-                videoPlayer.classList.remove('hls-style');
-                videoPlayer.classList.remove('no-controls');
+                iframePlayer.src = channel.source;
 
                 // Ocultar spinner después de cargar el iframe
                 iframePlayer.onload = function () {
                     hideSpinner();
-                    errorMessage.style.display = 'none'; // Asegurarse de ocultar el mensaje de error
+                    errorMessage.style.display = 'none';
                 };
 
                 iframePlayer.onerror = function () {
                     showError();
-                };
-            } else {
-                // MP4 or other formats
-                videoPlayer.src = source;
-
-                // Remover estilo específico para HLS si es necesario
-                videoPlayer.classList.remove('hls-style');
-                videoPlayer.classList.remove('no-controls');
-
-                videoPlayer.play().catch(() => {
-                    showError();
-                });
-
-                // Ocultar el mensaje de error cuando el video empiece a reproducirse
-                videoPlayer.onplaying = function () {
-                    hideSpinner();
-                    errorMessage.style.display = 'none'; // Asegurarse de ocultar el mensaje de error
                 };
             }
 
@@ -2315,85 +1738,220 @@
             hideOverlay();
         }
 
-        // Función para filtrar canales por categoría
-        function filterChannels(category) {
-            const channels = document.querySelectorAll('.channel-item');
-            channels.forEach(channel => {
-                const channelCategories = channel.getAttribute('data-category').split(','); // Dividir las categorías
-                if (category === 'all' || channelCategories.includes(category)) {
-                    channel.style.display = 'flex';
-                } else {
-                    channel.style.display = 'none';
-                }
-            });
+        function reloadCurrentVideo() {
+            if (!currentChannel) return;
+            
+            reloadButton.classList.add('loading');
+            
+            if (currentChannel.type === 'hls') {
+                videoPlayer.src = '';
+                
+                setTimeout(() => {
+                    if (Hls.isSupported()) {
+                        if (hlsInstance) {
+                            hlsInstance.destroy();
+                        }
+                        
+                        hlsInstance = new Hls();
+                        hlsInstance.loadSource(currentChannel.source);
+                        hlsInstance.attachMedia(videoPlayer);
+                        
+                        hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                            videoPlayer.play().catch(() => {
+                                showError();
+                            });
+                        });
+                    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                        videoPlayer.src = currentChannel.source;
+                        videoPlayer.play().catch(() => {
+                            showError();
+                        });
+                    }
+                    
+                    setTimeout(() => {
+                        reloadButton.classList.remove('loading');
+                    }, 1000);
+                }, 1000);
+            } else if (currentChannel.type === 'iframe') {
+                iframePlayer.src = 'about:blank';
+                
+                setTimeout(() => {
+                    iframePlayer.src = currentChannel.source;
+                    
+                    setTimeout(() => {
+                        reloadButton.classList.remove('loading');
+                    }, 1000);
+                }, 1000);
+            }
+        }
 
-            // Resaltar la categoría seleccionada
-            const categoryButtons = document.querySelectorAll('#overlay-category-list button');
+        // Funciones para categorías y canales
+        function renderCategories() {
+            const categoryList = document.getElementById('category-list');
+            const overlayList = document.getElementById('overlay-category-list');
+            
+            // Limpiar listas
+            categoryList.innerHTML = '';
+            overlayList.innerHTML = '';
+            
+            // Renderizar categorías
+            categories.forEach(category => {
+                // Categorías en la barra lateral
+                const listItem = document.createElement('li');
+                const button = document.createElement('button');
+                button.textContent = category.name;
+                button.onclick = () => filterChannels(category.id);
+                if (category.id === 'all') {
+                    button.classList.add('selected');
+                    selectedCategoryButton = button;
+                }
+                listItem.appendChild(button);
+                categoryList.appendChild(listItem);
+                
+                // Categorías en el overlay
+                const overlayItem = document.createElement('li');
+                const overlayButton = document.createElement('button');
+                overlayButton.textContent = category.name;
+                overlayButton.onclick = () => {
+                    filterChannels(category.id);
+                    updateOverlayCategorySelection(category.id);
+                };
+                if (category.id === 'all') {
+                    overlayButton.classList.add('selected');
+                }
+                overlayItem.appendChild(overlayButton);
+                overlayList.appendChild(overlayItem);
+            });
+        }
+
+        function renderChannels() {
+            const channelList = document.getElementById('channel-list');
+            const overlayChannelList = document.getElementById('overlay-channel-list');
+            
+            // Limpiar listas
+            channelList.innerHTML = '';
+            overlayChannelList.innerHTML = '';
+            
+            // Renderizar canales
+            channels.forEach(channel => {
+                // Canales en la barra lateral
+                const channelItem = document.createElement('div');
+                channelItem.className = 'channel-item';
+                channelItem.dataset.category = channel.categories.join(',');
+                channelItem.dataset.id = channel.id;
+                
+                const logoDiv = document.createElement('div');
+                logoDiv.className = 'channel-logo';
+                logoDiv.style.backgroundImage = `url('${channel.logo}')`;
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'channel-name';
+                nameDiv.textContent = channel.name;
+                
+                channelItem.appendChild(logoDiv);
+                channelItem.appendChild(nameDiv);
+                channelItem.onclick = () => {
+                    selectChannel(channelItem);
+                    playChannel(channel);
+                };
+                
+                channelList.appendChild(channelItem);
+                
+                // Canales en el overlay
+                const overlayItem = channelItem.cloneNode(true);
+                overlayItem.onclick = () => {
+                    selectChannel(overlayItem);
+                    playChannel(channel);
+                };
+                overlayChannelList.appendChild(overlayItem);
+            });
+        }
+
+        function filterChannels(categoryId) {
+            const channelItems = document.querySelectorAll('.channel-item');
+            
+            // Actualizar botón de categoría seleccionado
+            if (selectedCategoryButton) {
+                selectedCategoryButton.classList.remove('selected');
+            }
+            
+            const categoryButtons = document.querySelectorAll('#category-list button');
             categoryButtons.forEach(button => {
-                button.classList.remove('selected');
+                if (button.textContent === categories.find(c => c.id === categoryId)?.name) {
+                    button.classList.add('selected');
+                    selectedCategoryButton = button;
+                }
             });
-
-            const clickedButton = document.querySelector(`#overlay-category-list button[onclick*="'${category}'"]`);
-            if (clickedButton) {
-                clickedButton.classList.add('selected');
-            }
-        }
-
-        // Función para filtrar canales por búsqueda
-        function filterChannelsBySearch(context) {
-            const searchBar = document.getElementById(`${context}-search-bar`);
-            const query = searchBar.value.toLowerCase(); // Obtener el texto ingresado en minúsculas
-
-            // Seleccionar los canales correspondientes al contexto (sidebar u overlay)
-            const channels = document.querySelectorAll(`#${context === 'sidebar' ? 'channel-list' : 'overlay-channel-list'} .channel-item`);
-
-            channels.forEach(channel => {
-                const channelName = channel.querySelector('.channel-name').textContent.toLowerCase();
-                if (channelName.includes(query)) {
-                    channel.style.display = 'flex'; // Mostrar el canal si coincide
+            
+            // Filtrar canales
+            channelItems.forEach(item => {
+                const channelCategories = item.dataset.category.split(',');
+                if (categoryId === 'all' || channelCategories.includes(categoryId)) {
+                    item.style.display = 'flex';
                 } else {
-                    channel.style.display = 'none'; // Ocultar el canal si no coincide
+                    item.style.display = 'none';
                 }
             });
         }
 
-        // Función para resaltar el canal seleccionado
-        function selectChannel(event) {
-            const clickedChannel = event.currentTarget;
-
-            // Desresaltar el canal previamente seleccionado
-            if (selectedChannelItem) {
-                selectedChannelItem.classList.remove('selected');
-            }
-
-            // Resaltar el canal actualmente seleccionado
-            clickedChannel.classList.add('selected');
-            selectedChannelItem = clickedChannel;
+        function updateOverlayCategorySelection(categoryId) {
+            const overlayButtons = document.querySelectorAll('#overlay-category-list button');
+            overlayButtons.forEach(button => {
+                button.classList.remove('selected');
+                if (button.textContent === categories.find(c => c.id === categoryId)?.name) {
+                    button.classList.add('selected');
+                }
+            });
         }
 
-        // Asignar eventos de clic a los canales
-        document.querySelectorAll('.channel-item').forEach(channel => {
-            channel.addEventListener('click', selectChannel);
-        });
+        function selectChannel(channelItem) {
+            // Desresaltar el canal previamente seleccionado
+            const allChannelItems = document.querySelectorAll('.channel-item');
+            allChannelItems.forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Resaltar el canal seleccionado
+            channelItem.classList.add('selected');
+            
+            // Resaltar también el mismo canal en la otra lista
+            const channelId = channelItem.dataset.id;
+            const otherItems = document.querySelectorAll(`.channel-item[data-id="${channelId}"]`);
+            otherItems.forEach(item => {
+                item.classList.add('selected');
+            });
+        }
 
-        // Función para alternar pantalla completa
+        function filterChannelsBySearch(context) {
+            const searchBar = context === 'sidebar' ? sidebarSearchBar : overlaySearchBar;
+            const query = searchBar.value.toLowerCase();
+            const channelList = context === 'sidebar' ? 
+                document.getElementById('channel-list') : 
+                document.getElementById('overlay-channel-list');
+            
+            const channelItems = channelList.querySelectorAll('.channel-item');
+            
+            channelItems.forEach(item => {
+                const channelName = item.querySelector('.channel-name').textContent.toLowerCase();
+                if (channelName.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Funciones para pantalla completa
         function toggleFullscreen() {
-            // Verificar si la licencia está activada
-            if (!licenseSystem.isActivated) {
-                errorMessage.textContent = "Licencia no activada. Por favor active el software.";
-                errorMessage.style.display = "block";
-                return;
-            }
-
             if (!document.fullscreenElement) {
                 // Entrar en pantalla completa
                 if (videoContainer.requestFullscreen) {
                     videoContainer.requestFullscreen();
-                } else if (videoContainer.mozRequestFullScreen) { // Firefox
+                } else if (videoContainer.mozRequestFullScreen) {
                     videoContainer.mozRequestFullScreen();
-                } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari y Opera
+                } else if (videoContainer.webkitRequestFullscreen) {
                     videoContainer.webkitRequestFullscreen();
-                } else if (videoContainer.msRequestFullscreen) { // IE/Edge
+                } else if (videoContainer.msRequestFullscreen) {
                     videoContainer.msRequestFullscreen();
                 }
 
@@ -2407,11 +1965,11 @@
                 // Salir de pantalla completa
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
-                } else if (document.mozCancelFullScreen) { // Firefox
+                } else if (document.mozCancelFullScreen) {
                     document.mozCancelFullScreen();
-                } else if (document.webkitExitFullscreen) { // Chrome, Safari y Opera
+                } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { // IE/Edge
+                } else if (document.msExitFullscreen) {
                     document.msExitFullscreen();
                 }
 
@@ -2422,76 +1980,89 @@
             }
         }
 
-        // Función para mostrar/ocultar el menú en pantalla completa
         function toggleMenu() {
             if (fullscreenOverlay.style.display === 'block') {
                 hideOverlay();
             } else {
-                fullscreenOverlay.style.display = 'block';
+                showOverlay();
             }
         }
 
-        // Función para ocultar el overlay
-        function hideOverlay(event) {
-            // Ocultar el overlay solo si se hace clic fuera del contenido del overlay
-            if (event && event.target === fullscreenOverlay) {
-                fullscreenOverlay.style.display = 'none';
-            } else if (!event) {
-                fullscreenOverlay.style.display = 'none';
-            }
+        function showOverlay() {
+            fullscreenOverlay.style.display = 'block';
         }
 
-        // Función para detener la propagación de eventos dentro del overlay
-        function stopPropagation(event) {
-            event.stopPropagation(); // Evitar que el clic dentro del overlay cierre el menú
+        function hideOverlay() {
+            fullscreenOverlay.style.display = 'none';
         }
 
-        // Ajustar el tamaño del reproductor al cambiar la orientación o redimensionar la ventana
         function adjustVideoContainer() {
             if (document.fullscreenElement) {
                 // En modo de pantalla completa, forzar que el contenedor ocupe toda la pantalla
                 videoContainer.style.width = '100vw';
                 videoContainer.style.height = '100vh';
-                videoContainer.style.paddingTop = '0'; // Eliminar padding-top para evitar distorsión
-                fullscreenMenu.style.display = 'block'; // Mostrar el botón de menú
+                videoContainer.style.paddingTop = '0';
+                fullscreenMenu.style.display = 'block';
             } else {
                 // Fuera de pantalla completa, restaurar el diseño original
                 videoContainer.style.width = '';
                 videoContainer.style.height = '';
-                videoContainer.style.paddingTop = ''; // Restaurar relación de aspecto 16:9
-                fullscreenMenu.style.display = 'none'; // Ocultar el botón de menú
-                hideOverlay(); // Ocultar el overlay
+                videoContainer.style.paddingTop = '';
+                fullscreenMenu.style.display = 'none';
+                hideOverlay();
             }
         }
 
-        // Escuchar cambios en la orientación o redimensionamiento de la ventana
+        // Inicialización de la aplicación
+        function initializeApp() {
+            // Inicializar categorías y canales
+            renderCategories();
+            renderChannels();
+            
+            // Filtrar por la categoría "all" por defecto
+            filterChannels('all');
+            
+            // Event listeners para búsqueda
+            sidebarSearchBar.addEventListener('input', () => filterChannelsBySearch('sidebar'));
+            overlaySearchBar.addEventListener('input', () => filterChannelsBySearch('overlay'));
+            
+            // Event listener para botón de pantalla completa
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // Event listener para botón de recarga
+            reloadButton.addEventListener('click', reloadCurrentVideo);
+            
+            // Event listener para menú en pantalla completa
+            fullscreenMenu.querySelector('i').addEventListener('click', toggleMenu);
+            
+            // Event listener para cerrar overlay al hacer clic fuera del contenido
+            fullscreenOverlay.addEventListener('click', function(event) {
+                if (event.target === fullscreenOverlay) {
+                    hideOverlay();
+                }
+            });
+            
+            // Evitar que los clics dentro del overlay lo cierren
+            overlayContent.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+            
+            // Event listeners para cambios en pantalla completa
+            document.addEventListener('fullscreenchange', adjustVideoContainer);
+            document.addEventListener('webkitfullscreenchange', adjustVideoContainer);
+            document.addEventListener('mozfullscreenchange', adjustVideoContainer);
+            document.addEventListener('MSFullscreenChange', adjustVideoContainer);
+        }
+
+        // Event listeners para cambios en la orientación o redimensionamiento
         window.addEventListener('resize', adjustVideoContainer);
         window.addEventListener('orientationchange', adjustVideoContainer);
 
-        // Escuchar cambios en el modo de pantalla completa
-        document.addEventListener('fullscreenchange', adjustVideoContainer);
-        document.addEventListener('webkitfullscreenchange', adjustVideoContainer); // Chrome, Safari
-        document.addEventListener('mozfullscreenchange', adjustVideoContainer); // Firefox
-        document.addEventListener('msfullscreenchange', adjustVideoContainer); // IE/Edge
-
-        // Ajustar el contenedor inicialmente
-        adjustVideoContainer();
-
-        // Evitar que el #video-container active la pantalla completa al hacer clic
-        videoContainer.addEventListener('click', function (event) {
-            event.preventDefault(); // Prevenir cualquier comportamiento predeterminado
-        });
-
-        // Inicializar el sistema de licencia cuando se carga la página
-        window.addEventListener('load', function() {
-            licenseSystem.init();
+        // Inicializar el sistema de licencia cuando el documento esté listo
+        document.addEventListener("DOMContentLoaded", () => {
+            // Inicializar el sistema de licencia
+            StreamFusionLicense.init();
         });
     </script>
-
-    <!-- HLS.js library for HLS streaming support -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-    <!-- dash.js library for DASH streaming support -->
-    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
 </body>
 </html>
